@@ -7,7 +7,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
 
     const startSession = async () => {
         try {
-            const response = await axios.post('/session/start');
+            const response = await axios.post('http://localhost:1500/session/start');
             console.log(response.data); // remove this
             setSessionId(response.data.session_id);
             onSessionStart(response.data.session_id);

@@ -33,7 +33,7 @@ const Upload = ({ sessionId, onAdvanceStage }) => {
         formData.append('dataset', file);
 
         try {
-            const response = await axios.post(`/session/${sessionId}/upload-dataset`, formData, {
+            const response = await axios.post(`http://localhost:1500/session/${sessionId}/upload-dataset`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
