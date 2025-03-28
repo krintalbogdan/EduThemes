@@ -5,7 +5,6 @@ import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// TODO: rework with Context API
 const LabelModal = () => {
     const [labels, setLabels] = useState([]);
     const [newLabel, setNewLabel] = useState('');
