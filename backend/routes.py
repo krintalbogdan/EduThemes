@@ -89,6 +89,20 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 DATABASE = 'sessions.db'
 
+def cleanup_expired_sessions():
+    """
+    HELPER: Delete expired sessions
+    """
+    now = datetime.utcnow().isoformat()
+
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM sessions WHERE expires_at <= ?", (now,))
+        deleted = cursor.rowcount
+        conn.commit()
+
+    print(f"[Session Cleanup] Deleted {deleted} expired session(s)")
+
 def init_db():
     """
     HELPER: Initialize the DB and sessions table
@@ -173,6 +187,7 @@ def start_session():
     ROUTE: Start a new session
     """
     try:
+        cleanup_expired_sessions()
         session_id = create_session()
         return jsonify({"session_id": session_id})
     except Exception as e:
@@ -185,6 +200,7 @@ def upload_dataset(session_id):
     """
     try:
         # validate session
+        cleanup_expired_sessions()
         session = get_session(session_id)
         if not session:
             return jsonify({"error": "Invalid session"}), 400
