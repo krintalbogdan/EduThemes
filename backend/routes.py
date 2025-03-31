@@ -93,7 +93,9 @@ def cleanup_expired_sessions():
     """
     HELPER: Delete expired sessions
     """
-    now = datetime.utcnow().isoformat()
+    now = datetime.now()
+
+    print(now)
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -157,6 +159,10 @@ def update_session(session_id, **kwargs):
         update_fields.append(f"{key} = ?")
         values.append(value)
     
+    expires_at = datetime.now() + timedelta(minutes=30)
+    update_fields.append("expires_at = ?")
+    values.append(expires_at)
+
     values.append(session_id)
     
     if update_fields:
