@@ -10,7 +10,7 @@
 In a separate terminal
 5. Run `cd ../backend`
 6. Run `python -m venv venv` (or whatever running python equivalent like `py -m venv venv`)
-7. Run `source venv/bin/activate` on Mac/Linux or `venv\Scripts\activate` on Windows
+7. Run `source venv/bin/activate` on Mac/Linux or `venv/Scripts/activate` on Windows
 8. **Verify that you see `(venv)` at the beginning of your command prompt before doing any work**
 9. Run `pip install -r requirements.txt`
 10. Run `flask run --port 1500`
