@@ -11,8 +11,10 @@
     "ajv-keywords": "^5.1.0",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.8",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
     "react-scripts": "^5.0.1",
     "recharts": "^2.15.1",
@@ -45,5 +47,4 @@
   "devDependencies": {
     "@babel/plugin-transform-private-property-in-object": "^7.25.9"
   }
-
 }
