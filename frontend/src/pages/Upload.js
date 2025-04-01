@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Form, Alert, Container, Card } from 'react-bootstrap';
 import axios from 'axios';
 
-const Upload = ({ sessionId, onAdvanceStage }) => {
+const Upload = ({ sessionId, onAdvanceStage, setDataset }) => {
     const [file, setFile] = useState(null);
     const [error, setError] = useState(null);
 
@@ -40,6 +40,7 @@ const Upload = ({ sessionId, onAdvanceStage }) => {
             });
 
             console.log('Dataset uploaded:', response.data);
+            setDataset(response.data.preprocessed_dataset);
             onAdvanceStage();
         } catch (err) {
             setError('Failed to upload dataset');
@@ -51,8 +52,7 @@ const Upload = ({ sessionId, onAdvanceStage }) => {
             className="d-flex flex-column justify-content-center align-items-center"
             style={{ height: '80vh' }}
         >
-
-            <Card className="w-50 mx-auto">
+            <Card className="w-50 mx-auto" style={{textAlign: 'center'}}>
                 <Card.Header>Upload Dataset</Card.Header>
                 <Card.Body>
                     {error && <Alert variant="danger">{error}</Alert>}

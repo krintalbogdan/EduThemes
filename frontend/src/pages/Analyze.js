@@ -11,7 +11,6 @@ const Analyze = ({ sessionId, onAdvanceStage }) => {
             <div className="dataCard revenue">
                 Chart 1
                 <Bar 
-                    data=
                 />
             </div>
             
