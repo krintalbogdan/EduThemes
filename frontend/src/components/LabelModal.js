@@ -5,8 +5,7 @@ import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const LabelModal = () => {
-    const [labels, setLabels] = useState([]);   
+const LabelModal = ({ labels = [], setLabels }) => {
     const [newLabel, setNewLabel] = useState('');
     const [selectedColor, setSelectedColor] = useState('#007bff');
     const [show, setShow] = useState(true);

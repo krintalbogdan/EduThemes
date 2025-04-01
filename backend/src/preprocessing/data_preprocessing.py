@@ -53,8 +53,9 @@ def preprocess_file(file_path, output_path):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     for question, df_proc in preprocessed.items():
-        safe_name = "".join([c if c.isalnum() else "_" for c in question])
-        out_file = os.path.join(output_path, f"{safe_name}_preprocessed.csv")
+        # safe_name = "".join([c if c.isalnum() else "_" for c in question])
+        file_name = file_path.split("/")[-1]
+        out_file = os.path.join(output_path, f"{file_name}_preprocessed.csv")
         df_proc.to_csv(out_file, index=False)
         logging.info(f"Saved preprocessed data for '{question}' to {out_file}")
 

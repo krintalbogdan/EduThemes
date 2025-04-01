@@ -33,7 +33,7 @@ def generate_cluster_title(texts):
     most_common, _ = Counter(words).most_common(1)[0]
     return most_common.capitalize()
 
-def train_svm_on_question(preprocessed_folder, question, svm_output_csv, model_output_path, projection_csv,
+def train_svm_on_question(preprocessed_folder, input_file, question, svm_output_csv, model_output_path, projection_csv,
                           gamma_kernel=0.5, similarity_threshold=0.8, kpca_gamma=0.1):
     """
     Loads the preprocessed CSV for the given survey question, vectorizes the cleaned responses,
@@ -41,8 +41,9 @@ def train_svm_on_question(preprocessed_folder, question, svm_output_csv, model_o
     TF‑IDF features to 2D with Kernel PCA, trains an SVC classifier on the 2D data, saves the model,
     writes the 2D projection, and outputs a CSV of classification results
     """
-    safe_name = "".join([c if c.isalnum() else "_" for c in question])
-    file_path = os.path.join(preprocessed_folder, f"{safe_name}_preprocessed.csv")
+    # safe_name = "".join([c if c.isalnum() else "_" for c in question])
+    file_name = input_file.split("/")[-1]
+    file_path = os.path.join(preprocessed_folder, f"{file_name}_preprocessed.csv")
     if not os.path.exists(file_path):
         logging.error(f"Preprocessed file for question '{question}' not found at {file_path}")
         sys.exit(1)
@@ -107,4 +108,4 @@ if __name__ == '__main__':
     svm_output_csv = sys.argv[3]
     model_output_path = sys.argv[4]
     projection_csv = sys.argv[5]
-    train_svm_on_question(preprocessed_folder, question, svm_output_csv, model_output_path, projection_csv)
+    train_svm_on_question(preprocessed_folder, None, question, svm_output_csv, model_output_path, projection_csv)
