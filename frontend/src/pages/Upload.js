@@ -51,6 +51,7 @@ const Upload = ({ sessionId, onAdvanceStage }) => {
             className="d-flex flex-column justify-content-center align-items-center"
             style={{ height: '80vh' }}
         >
+
             <Card className="w-50 mx-auto">
                 <Card.Header>Upload Dataset</Card.Header>
                 <Card.Body>

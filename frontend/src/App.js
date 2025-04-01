@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import './App.css';
-import LabelModal from "./components/LabelModal";
-import Header from "./components/Header";
-import Upload from "./components/Upload";
-import Start from "./components/Start";
-import Preview from "./components/Preview";
+import Header from "./component/Header";
+import Upload from "./pages/Upload";
+import Start from "./pages/Start";
+import Preview from "./pages/Preview";
+import Analyze from "./pages/Analyze";
 import { Container } from 'react-bootstrap';
 
 function App() {
@@ -45,6 +45,16 @@ function App() {
             />
           </div>
         )}
+
+        {currentStage === 'analyze' && sessionId && (
+          <div>
+            <Analyze 
+              sessionId={sessionId}
+              onAdvanceStage={() => handleAdvanceStage('start')} 
+            />
+          </div>
+        )}
+
 
       </Container>
     </div>

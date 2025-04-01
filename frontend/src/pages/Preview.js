@@ -1,8 +1,15 @@
 import React from 'react';
 import { Container, Button, Card, Row, Col } from 'react-bootstrap';
-import LabelModal from './LabelModal';
+import LabelModal from '../component/LabelModal';
 
 const Preview = ({ sessionId, onAdvanceStage }) => {
+
+
+    const Analyze = () => {
+        console.log("Analyze clicked");
+        onAdvanceStage();
+    }
+
     return (
         <Container fluid className="d-flex justify-content-center align-items-start p-0" style={{ padding: '0', height: '90vh' }}>
             <Row className="h-100 m-0 w-100 gap-3">
@@ -23,7 +30,9 @@ const Preview = ({ sessionId, onAdvanceStage }) => {
                                 <LabelModal /> &nbsp;
                                 <Button variant="outline-dark" disabled>Responses: 500</Button>
                             </div>
-                            <Button>Analyze</Button>
+                            <Button
+                                onClick={Analyze}
+                            >Analyze</Button>
                         </Card.Header>
                         <Card.Body>
                             <h3>test_file.xlsx</h3>
