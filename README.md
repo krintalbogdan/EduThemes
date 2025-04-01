@@ -7,7 +7,7 @@
 2. Run `npm install`
 3. Run `npm start`
 
-### In a separate terminal
+In a separate terminal
 
 5. Run `cd ../backend`
 6. Run `python -m venv venv` (or whatever running python equivalent like `py -m venv venv`)
