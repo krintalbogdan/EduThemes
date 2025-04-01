@@ -12,7 +12,7 @@ const LabelModal = () => {
     const [show, setShow] = useState(false);
 
     const toggleShow = () => setShow(!show);
-
+ 
     const singleLabel = () => {
         // ignore duplicates/blank labels
         if (newLabel.trim() === '' || labels.some(label => label.name.toLowerCase() === newLabel.toLowerCase())) return;
@@ -40,7 +40,7 @@ const LabelModal = () => {
                 const [name] = row.split(',').map(item => item.trim());
                 // setNewLabel(name);
                 if (name && !(name.trim() === '' || labels.some(label => label.name.toLowerCase() === name.toLowerCase()))) {
-                    newLabels.push({ name, color: '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0') }); // https://stackoverflow.com/questions/5092808/how-do-i-randomly-generate-html-hex-color-codes-using-javascript
+                    newLabels.push({ name, color: ('#007bff') });
                 }
             });
 
@@ -49,6 +49,7 @@ const LabelModal = () => {
     };
 
     // TODO: allow users to recolor existing labels
+
     return (
         <>
             <Button variant="primary" onClick={toggleShow}>Edit Labels</Button>
@@ -58,6 +59,7 @@ const LabelModal = () => {
                     <Modal.Title>Labels</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    
                     <Form className="mb-2 d-flex gap-2">
                         <Form.Control
                             type="text"
