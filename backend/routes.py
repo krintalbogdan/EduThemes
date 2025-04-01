@@ -81,6 +81,8 @@ from werkzeug.utils import secure_filename
 import uuid
 import sqlite3
 from datetime import datetime, timedelta
+import pandas as pd
+from run_pipeline import main as run_pipeline_main
 
 routes_bp = Blueprint('routes', __name__)
 
@@ -93,7 +95,9 @@ def cleanup_expired_sessions():
     """
     HELPER: Delete expired sessions
     """
-    now = datetime.utcnow().isoformat()
+    now = datetime.now()
+
+    print(now)
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -124,6 +128,8 @@ def init_db():
             )
         ''')
         conn.commit()
+    
+    # TODO: Delete files associated with expired sessions
 
 def create_session():
     """
@@ -157,6 +163,10 @@ def update_session(session_id, **kwargs):
         update_fields.append(f"{key} = ?")
         values.append(value)
     
+    expires_at = datetime.now() + timedelta(minutes=30)
+    update_fields.append("expires_at = ?")
+    values.append(expires_at)
+
     values.append(session_id)
     
     if update_fields:
@@ -215,6 +225,30 @@ def upload_dataset(session_id):
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
 
+        preprocessed_folder = os.path.join(UPLOAD_FOLDER, "processed")
+        os.makedirs(preprocessed_folder, exist_ok=True)
+        # preprocessed_file_path = os.path.join(preprocessed_folder, f"{session_id}_preprocessed.csv")
+        preprocessed_file_path = os.path.join(preprocessed_folder, f"{filename}_preprocessed.csv")
+        # preprocessed_file_path = f"./data/processed/Test_question_preprocessed.csv"
+        svm_output_csv = os.path.join(preprocessed_folder, f"{filename}_svm_output.csv")
+        model_output_path = os.path.join(preprocessed_folder, f"{filename}_svm_model.pkl")
+        projection_csv = os.path.join(preprocessed_folder, f"{filename}_projection.csv")
+
+        # run the pipeline
+        run_pipeline_main(
+            input_file=filepath,
+            svm_output_csv=svm_output_csv,
+            model_output_path=model_output_path,
+            projection_csv=projection_csv
+        )
+
+        # Read the preprocessed dataset
+        if os.path.exists(preprocessed_file_path):
+            preprocessed_data = pd.read_csv(preprocessed_file_path)
+            preprocessed_array = preprocessed_data.to_dict(orient='records')
+        else:
+            preprocessed_array = []
+
         # update session entry with dataset info
         update_session(session_id, 
             dataset_path=filepath, 
@@ -223,8 +257,9 @@ def upload_dataset(session_id):
         )
 
         return jsonify({
-            "message": "Dataset uploaded successfully",
-            "session_id": session_id
+            "message": "Dataset uploaded successfully and pipeline executed",
+            "session_id": session_id,
+            "preprocessed_dataset": preprocessed_array
         })
     except Exception as e:
         print(f"Error: {str(e)}")

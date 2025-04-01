@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Form, Alert, Container, Card } from 'react-bootstrap';
 import axios from 'axios';
 
-const Upload = ({ sessionId, onAdvanceStage }) => {
+const Upload = ({ sessionId, onAdvanceStage, setDataset }) => {
     const [file, setFile] = useState(null);
     const [error, setError] = useState(null);
 
@@ -33,13 +33,14 @@ const Upload = ({ sessionId, onAdvanceStage }) => {
         formData.append('dataset', file);
 
         try {
-            const response = await axios.post(`/session/${sessionId}/upload-dataset`, formData, {
+            const response = await axios.post(`http://localhost:1500/session/${sessionId}/upload-dataset`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
 
             console.log('Dataset uploaded:', response.data);
+            setDataset(response.data.preprocessed_dataset);
             onAdvanceStage();
         } catch (err) {
             setError('Failed to upload dataset');
@@ -51,7 +52,7 @@ const Upload = ({ sessionId, onAdvanceStage }) => {
             className="d-flex flex-column justify-content-center align-items-center"
             style={{ height: '80vh' }}
         >
-            <Card className="w-50 mx-auto">
+            <Card className="w-50 mx-auto" style={{textAlign: 'center'}}>
                 <Card.Header>Upload Dataset</Card.Header>
                 <Card.Body>
                     {error && <Alert variant="danger">{error}</Alert>}

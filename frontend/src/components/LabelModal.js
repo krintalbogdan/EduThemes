@@ -5,11 +5,10 @@ import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const LabelModal = () => {
-    const [labels, setLabels] = useState([]);
+const LabelModal = ({ labels = [], setLabels }) => {
     const [newLabel, setNewLabel] = useState('');
     const [selectedColor, setSelectedColor] = useState('#007bff');
-    const [show, setShow] = useState(false);
+    const [show, setShow] = useState(true);
 
     const toggleShow = () => setShow(!show);
 
@@ -51,17 +50,17 @@ const LabelModal = () => {
     // TODO: allow users to recolor existing labels
     return (
         <>
-            <Button variant="primary" onClick={toggleShow}>Edit Labels</Button>
+            <Button variant="primary" onClick={toggleShow}>Edit Themes</Button>
 
             <Modal show={show} onHide={toggleShow} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Labels</Modal.Title>
+                    <Modal.Title>Themes</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form className="mb-2 d-flex gap-2">
                         <Form.Control
                             type="text"
-                            placeholder="Enter label name"
+                            placeholder="Enter theme name"
                             value={newLabel}
                             onChange={(e) => setNewLabel(e.target.value)}
                             onKeyDown={(e) => {

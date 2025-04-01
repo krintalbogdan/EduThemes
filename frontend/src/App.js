@@ -5,11 +5,13 @@ import Header from "./components/Header";
 import Upload from "./components/Upload";
 import Start from "./components/Start";
 import Preview from "./components/Preview";
+import Review from "./components/Review";
 import { Container } from 'react-bootstrap';
 
 function App() {
   const [sessionId, setSessionId] = useState(null);
-  const [currentStage, setCurrentStage] = useState('start'); // stages: start screen, upload dataset, preview dataset & labeling, results
+  const [dataset, setDataset] = useState(null);
+  const [currentStage, setCurrentStage] = useState('start'); // stages: start screen, upload dataset, preview dataset, review, results
 
   const handleSessionStart = (newSessionId) => {
     setSessionId(newSessionId);
@@ -33,6 +35,7 @@ function App() {
         {currentStage === 'upload' && sessionId && (
           <Upload 
             sessionId={sessionId}
+            setDataset={setDataset} 
             onAdvanceStage={() => handleAdvanceStage('preview')} 
           />
         )}
@@ -41,7 +44,18 @@ function App() {
           <div>
             <Preview 
               sessionId={sessionId}
-              onAdvanceStage={() => handleAdvanceStage('analyze')} 
+              dataset={dataset}
+              setDataset={setDataset}
+              onAdvanceStage={() => handleAdvanceStage('review')} 
+            />
+          </div>
+        )}
+
+        {currentStage === 'review' && sessionId && (
+          <div>
+            <Review 
+              sessionId={sessionId}
+              onAdvanceStage={() => handleAdvanceStage('results')} 
             />
           </div>
         )}
