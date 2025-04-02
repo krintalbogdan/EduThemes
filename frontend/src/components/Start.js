@@ -90,6 +90,20 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
                     It uses AI to group similar answers together and summarize them into clear insights,
                     so you can understand your data faster and make informed decisions.
                 </div>
+
+                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <Button
+                        variant="primary"
+                        onClick={startSession}
+                        style={{
+                            fontWeight: 'bold',
+                            padding: '10px 20px',
+                            fontSize: '16px',
+                        }}
+                    >
+                        Start New Session
+                    </Button>
+                </div>
                 <div>
                     <div style={sectionTitleStyle}>Features</div>
                     <div style={featuresStyle}>
@@ -107,22 +121,9 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
                         </div>
                         <div style={featureItemStyle}>
                             <FaLightbulb style={iconStyle} />
-                            <div>Help on<br />next steps</div>
+                            <div>Gain<br />key insights</div>
                         </div>
                     </div>
-                </div>
-                <div style={{ textAlign: 'center', marginTop: '30px' }}>
-                    <Button
-                        variant="primary"
-                        onClick={startSession}
-                        style={{
-                            fontWeight: 'bold',
-                            padding: '10px 20px',
-                            fontSize: '16px',
-                        }}
-                    >
-                        Start New Session
-                    </Button>
                 </div>
                 <div style={{
                     fontSize: '24px',
