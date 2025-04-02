@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Button, Card, Badge, Col } from 'react-bootstrap';
-import LabelModal from './LabelModal';
 
 const Review = ({ sessionId, onAdvanceStage }) => {
-    const [isPreprocessed, setIsPreprocessed] = useState(false);
-
     return (
         <Container fluid className="d-flex justify-content-center align-items-start p-0" style={{ padding: '0', height: '90vh' }}>
                 <Col xs={8} className="p-2 h-100 d-flex bg-light flex-column">

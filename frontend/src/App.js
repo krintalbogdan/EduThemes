@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './App.css';
-import LabelModal from "./components/LabelModal";
 import Header from "./components/Header";
 import Upload from "./components/Upload";
 import Start from "./components/Start";

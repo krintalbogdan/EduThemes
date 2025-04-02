@@ -3,7 +3,6 @@ import { Container, Button, Card, Row, Col, Form, Table, Badge } from 'react-boo
 import LabelModal from './LabelModal';
 
 const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
-    const [isPreprocessed, setIsPreprocessed] = useState(false);
     const [selectedEntry, setSelectedEntry] = useState(null);
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [labels, setLabels] = useState([]);
@@ -110,13 +109,6 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                         <Card.Header className="d-flex justify-content-between align-items-center">
                             <div className="d-flex align-items-center">
                                 <LabelModal labels={labels || []} setLabels={setLabels} />
-                                <Form.Check
-                                    type="switch"
-                                    id="data-toggle-switch"
-                                    checked={isPreprocessed}
-                                    onChange={() => setIsPreprocessed(!isPreprocessed)}
-                                    style={{ marginLeft: '10px' }}
-                                />
                             </div>
                             <div className="d-flex align-items-center">
                                 <Button variant="outline-dark" disabled>

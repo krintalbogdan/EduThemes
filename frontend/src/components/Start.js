@@ -4,12 +4,10 @@ import axios from 'axios';
 import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa'; //from react icons, for the features icons
 
 const Start = ({ onSessionStart, onAdvanceStage }) => {
-    const [sessionId, setSessionId] = useState(null);
 
     const startSession = async () => {
         try {
             const response = await axios.post('http://localhost:1500/session/start');
-            setSessionId(response.data.session_id);
             onSessionStart(response.data.session_id);
             onAdvanceStage();
         } catch (error) {
