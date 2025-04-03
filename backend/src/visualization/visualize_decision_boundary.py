@@ -4,6 +4,8 @@ import logging
 import joblib
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # non-interactive backend for matplotlib
 import matplotlib.pyplot as plt
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
@@ -14,10 +16,10 @@ def plot_decision_boundary(model_path, projection_csv, title="Decision Boundary"
     """
     if not os.path.exists(model_path):
         logging.error(f"Model file not found at {model_path}")
-        return
+        raise FileNotFoundError(f"Model file not found at {model_path}")
     if not os.path.exists(projection_csv):
         logging.error(f"Projection CSV not found at {projection_csv}")
-        return
+        raise FileNotFoundError(f"Projection CSV not found at {projection_csv}")
 
     svc = joblib.load(model_path)
     df_proj = pd.read_csv(projection_csv)
