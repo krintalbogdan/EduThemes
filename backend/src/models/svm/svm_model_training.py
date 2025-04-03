@@ -42,7 +42,7 @@ def train_svm_on_question(preprocessed_folder, input_file, question, svm_output_
     writes the 2D projection, and outputs a CSV of classification results
     """
     # safe_name = "".join([c if c.isalnum() else "_" for c in question])
-    file_name = os.path.basename(input_file)
+    file_name = os.path.splitext(os.path.basename(input_file))[0]
     file_path = os.path.join(preprocessed_folder, f"{file_name}_preprocessed.csv")
     if not os.path.exists(file_path):
         logging.error(f"Preprocessed file for question '{question}' not found at {file_path}")

@@ -91,7 +91,7 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                         <Card.Body className="rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
                             {selectedEntry ? (
                                 <>
-                                    <h5>Selected Entry</h5>
+                                    <strong>Selected Entry</strong>
                                     <hr />
                                     <p><strong>Original:</strong> {selectedEntry.original}</p>
                                     <p><strong>Cleaned:</strong> {selectedEntry.cleaned}</p>

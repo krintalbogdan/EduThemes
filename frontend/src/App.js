@@ -10,6 +10,7 @@ import { Container } from 'react-bootstrap';
 function App() {
   const [sessionId, setSessionId] = useState(null);
   const [dataset, setDataset] = useState(null);
+  const [visualization, setVisualization] = useState(null);
   const [currentStage, setCurrentStage] = useState('start'); // stages: start screen, upload dataset, preview dataset, review, results
 
   const handleSessionStart = (newSessionId) => {
@@ -35,6 +36,7 @@ function App() {
           <Upload 
             sessionId={sessionId}
             setDataset={setDataset} 
+            setVisualization={setVisualization}
             onAdvanceStage={() => handleAdvanceStage('preview')} 
           />
         )}
@@ -54,6 +56,7 @@ function App() {
           <div>
             <Review 
               sessionId={sessionId}
+              visualization={visualization}
               onAdvanceStage={() => handleAdvanceStage('results')} 
             />
           </div>

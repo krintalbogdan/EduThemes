@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Container, Button, Card, Row, Col } from 'react-bootstrap';
+import { Container, Button, Card, Row, Col, Modal } from 'react-bootstrap';
 import { FaCheck, FaTimes, FaUndo } from 'react-icons/fa';
 
-const Review = ({ sessionId, onAdvanceStage }) => {
+const Review = ({ sessionId, visualization, onAdvanceStage }) => {
     const [actions, setActions] = useState(Array(15).fill(null)); 
+    const [showModal, setShowModal] = useState(false);
 
     const handleAction = (index, action) => {
         const updatedActions = [...actions];
@@ -37,11 +38,25 @@ const Review = ({ sessionId, onAdvanceStage }) => {
                             </p>
                         </Card.Body>
                     </Card>
-                    <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '74%' }}>
-                        <Card.Body className="rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
+                    <Card className="mb-2" style={{ height: '39%' }}>
+                        <Card.Body className="rounded d-flex flex-column">
+                            <strong>Assigned Themes</strong><hr/>
                             <p className="text-muted">
-                                (Will add visualizations from SVM here)
+                                This page allows you to approve or reject the AI-generated codes for each entry. Responses were grouped by the SVM model and each group was coded by Claude.
                             </p>
+                        </Card.Body>
+                    </Card>
+                    <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '34%' }}>
+                        <Card.Body className="rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
+                            <strong>SVM Clusters</strong><hr/>
+                            {visualization && (
+                                <img 
+                                    src={`data:image/png;base64,${visualization}`} 
+                                    alt="Visualization" 
+                                    style={{ width: '100%', height: 'auto', cursor: 'pointer' }} 
+                                    onClick={() => setShowModal(true)}
+                                />
+                            )}
                         </Card.Body>
                     </Card>
                 </Col>
@@ -124,6 +139,21 @@ const Review = ({ sessionId, onAdvanceStage }) => {
                     </Card>
                 </Col>
             </Row>
+
+            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>SVM Clusters</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="d-flex justify-content-center">
+                    {visualization && (
+                        <img 
+                            src={`data:image/png;base64,${visualization}`} 
+                            alt="Visualization Enlarged" 
+                            style={{ width: '100%', height: 'auto' }} 
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
         </Container>
     );
 };

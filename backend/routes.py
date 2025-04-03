@@ -51,6 +51,7 @@ import time
 import pandas as pd
 from run_pipeline import main as run_pipeline_main
 import json
+import base64
 
 routes_bp = Blueprint('routes', __name__)
 
@@ -191,21 +192,23 @@ def upload_dataset(session_id):
         file = request.files['dataset']
         
         # save file
-        filename = secure_filename(f"{session_id}_{file.filename}")
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        filename = secure_filename(f"{session_id}_{os.path.splitext(file.filename)[0]}")
+        filepath = os.path.join(UPLOAD_FOLDER, f"{filename}{os.path.splitext(file.filename)[1]}")
         file.save(filepath)
 
-        preprocessed_folder = os.path.join(UPLOAD_FOLDER, "processed")
-        os.makedirs(preprocessed_folder, exist_ok=True)
+        processed_folder = os.path.join(UPLOAD_FOLDER, "svm_processed")
+        os.makedirs(processed_folder, exist_ok=True)
         # preprocessed_file_path = os.path.join(preprocessed_folder, f"{session_id}_preprocessed.csv")
-        preprocessed_file_path = os.path.join(preprocessed_folder, f"{filename}_preprocessed.csv")
+        preprocessed_file_path = os.path.join(processed_folder, f"{filename}_preprocessed.csv")
+        visualization_path = os.path.join(processed_folder, f"{filename}_decision_boundary.png")
 
         # run the pipeline
         run_pipeline_main(
             input_file=filepath,
-            svm_output_csv=os.path.join(preprocessed_folder, f"{filename}_svm_output.csv"),
-            model_output_path=os.path.join(preprocessed_folder, f"{filename}_svm_model.pkl"),
-            projection_csv=os.path.join(preprocessed_folder, f"{filename}_projection.csv")
+            svm_output_csv=os.path.join(processed_folder, f"{filename}_svm_output.csv"),
+            model_output_path=os.path.join(processed_folder, f"{filename}_svm_model.pkl"),
+            projection_csv=os.path.join(processed_folder, f"{filename}_projection.csv"),
+            visualization=visualization_path,
         )
 
         # read the preprocessed dataset
@@ -215,6 +218,10 @@ def upload_dataset(session_id):
         else:
             raise FileNotFoundError(f"Preprocessed file not found at {preprocessed_file_path}")
             
+        # encode the visualization image as base64
+        with open(visualization_path, "rb") as image_file:
+            visualization_base64 = base64.b64encode(image_file.read()).decode('utf-8')
+
         # update session entry with dataset info
         update_session(session_id, 
             dataset_path=filepath, 
@@ -225,7 +232,8 @@ def upload_dataset(session_id):
         return jsonify({
             "message": "Dataset uploaded successfully and pipeline executed",
             "session_id": session_id,
-            "preprocessed_dataset": preprocessed_array
+            "preprocessed_dataset": preprocessed_array,
+            "visualization_image": visualization_base64
         })
     except Exception as e:
         print(f"Error: {str(e)}")

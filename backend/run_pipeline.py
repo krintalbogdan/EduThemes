@@ -7,7 +7,7 @@ from src.preprocessing.data_preprocessing import preprocess_file
 from src.models.svm.svm_model_training import train_svm_on_question
 from src.visualization.visualize_decision_boundary import plot_decision_boundary
 
-def main(input_file, svm_output_csv, model_output_path, projection_csv, selected_question=None):
+def main(input_file, svm_output_csv, model_output_path, projection_csv, visualization, selected_question=None):
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
     
     # STEP 1: Preprocessing
@@ -15,7 +15,7 @@ def main(input_file, svm_output_csv, model_output_path, projection_csv, selected
         logging.error("The specified raw dataset file does not exist.")
         raise FileNotFoundError(f"File not found: {input_file}")
     
-    preprocessed_folder = os.path.join(".", "uploads", "processed")
+    preprocessed_folder = os.path.join(".", "uploads", "svm_processed")
     logging.info("Running data preprocessing...")
     preprocess_file(input_file, preprocessed_folder)
     
@@ -44,11 +44,11 @@ def main(input_file, svm_output_csv, model_output_path, projection_csv, selected
     logging.info(f"Selected question: {selected_question}")
     
     logging.info("Training SVM classifier on the selected question...")
-    # train_svm_on_question(preprocessed_folder, input_file, selected_question, svm_output_csv, model_output_path, projection_csv)
+    train_svm_on_question(preprocessed_folder, input_file, selected_question, svm_output_csv, model_output_path, projection_csv)
     
     # # STEP 3: Visualize Decision Boundary
     logging.info("Visualizing decision boundary...")
-    # plot_decision_boundary(model_output_path, projection_csv, title=selected_question)
+    plot_decision_boundary(model_output_path, projection_csv, visualization, title=selected_question)
     
     logging.info("Pipeline complete.")
 

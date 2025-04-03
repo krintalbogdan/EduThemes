@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Form, Alert, Container, Card, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
-const Upload = ({ sessionId, onAdvanceStage, setDataset }) => {
+const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization }) => {
     const [file, setFile] = useState(null);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +43,7 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset }) => {
 
             console.log('Dataset uploaded:', response.data);
             setDataset(response.data.preprocessed_dataset);
+            setVisualization(response.data.visualization_image);
             onAdvanceStage();
         } catch (err) {
             setError('Failed to upload dataset');
