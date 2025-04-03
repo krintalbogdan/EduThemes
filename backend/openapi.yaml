@@ -1,0 +1,200 @@
+# sana: go to editor.swagger.io for a more readable format
+
+openapi: 3.0.0
+info:
+  title: EduThemes API
+  version: 1.0.0
+paths:
+  /session/start:
+    post:
+      summary: Start a new analysis session
+      operationId: startSession
+      responses:
+        200:
+          description: Session started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                    description: Unique session identifier
+  /session/{session_id}/upload-dataset:
+    post:
+      summary: Upload the dataset of student responses
+      operationId: uploadDataset
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: The session ID to associate the dataset with
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dataset:
+                  type: array
+                  items:
+                    type: object
+                  description: The dataset of student responses to analyze
+      responses:
+        200:
+          description: Dataset uploaded and pre-processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preprocessed_dataset:
+                    type: array
+                    items:
+                      type: object
+                    description: The same dataset after pre-processing
+        400:
+          description: Invalid dataset format
+  /session/{session_id}/get-suggested-labels:
+    post:
+      summary: Get AI-generated label suggestions based on the dataset
+      operationId: getSuggestedLabels
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: The session ID to associate the labels with
+          schema:
+            type: string
+      responses:
+        200:
+          description: AI-generated label suggestions returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ai_suggestions:
+                    type: array
+                    items:
+                      type: string
+                    description: List of AI-generated theme labels
+        400:
+          description: Error generating AI suggestions
+  /session/{session_id}/upload-manual-coding:
+    post:
+      summary: Upload manually coded responses
+      operationId: uploadManualCoding
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: The session ID to associate the manual coding with
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preprocessed_dataset:
+                  type: array
+                  items:
+                    type: object
+                  description: The pre-processed dataset after cleaning or transforming
+                labels:
+                  type: array
+                  items:
+                    type: string
+                  description: List of theme labels defined by the instructor or AI
+                manual_coding:
+                  type: array
+                  items:
+                    type: object
+                  description: List of manually coded responses
+      responses:
+        200:
+          description: Manual coding uploaded successfully
+        400:
+          description: Invalid manual coding format
+  /session/{session_id}/perform-analysis:
+    post:
+      summary: Perform thematic analysis on the dataset
+      operationId: performAnalysis
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: The session ID to associate the analysis with
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preprocessed_dataset:
+                  type: array
+                  items:
+                    type: object
+                  description: The pre-processed dataset after cleaning or transforming
+                labels:
+                  type: array
+                  items:
+                    type: string
+                  description: List of theme labels defined by the instructor or AI
+                model_choice:
+                  type: string
+                  enum: [model1, model2, model3]
+                  description: The model to use for the thematic analysis
+      responses:
+        200:
+          description: Analysis completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  analysis_results:
+                    type: object
+                    description: The results of the thematic analysis
+        400:
+          description: Invalid model choice or analysis error
+  /session/{session_id}/get-results:
+    get:
+      summary: Retrieve the analysis results for the session
+      operationId: getResults
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: The session ID to fetch results for
+          schema:
+            type: string
+      responses:
+        200:
+          description: Results returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preprocessed_dataset:
+                    type: array
+                    items:
+                      type: object
+                    description: The pre-processed dataset after cleaning or transforming
+                  labels:
+                    type: array
+                    items:
+                      type: string
+                    description: List of theme labels defined by the instructor or AI
+                  analysis_results:
+                    type: object
+                    description: The results of the thematic analysis
+        404:
+          description: Results not found or session expired
