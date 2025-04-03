@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
 import './App.css';
-import LabelModal from "./components/LabelModal";
+import React, { useState } from 'react';
 import Header from "./components/Header";
 import Upload from "./components/Upload";
 import Start from "./components/Start";
 import Preview from "./components/Preview";
 import Review from "./components/Review";
+import ChatBot from "./component/Chatbot";
+
 import { Container } from 'react-bootstrap';
 
 function App() {
