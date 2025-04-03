@@ -22,7 +22,7 @@ def clean_data(input_file, output_file=None):
     cleaned_df.to_csv(output_file, index=False)
     return output_file
 
-input_file = '/content/e655f4bc-2498-4bad-847e-446616d7df44_sample_data.xlsx_svm_output_simple_themes.csv'
+input_file = 'data_file_from_svm.csv'
 cleaned_file = clean_data(input_file)
 
 import pandas as pd
@@ -96,4 +96,4 @@ def process_dataset(input_csv, output_csv, api_key):
     output_df = pd.DataFrame(output_rows, columns=output_columns)
     output_df.to_csv(output_csv, index=False)
 
-process_dataset('/content/cleaned.csv', 'output_themes.csv', "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")
+process_dataset('cleaned.csv', 'output.csv', "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")
