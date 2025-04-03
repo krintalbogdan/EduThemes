@@ -53,8 +53,16 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
         <Container fluid className="d-flex justify-content-center align-items-start p-0" style={{ padding: '0', height: '90vh' }}>
             <Row className="h-100 m-0 w-100 gap-3">
                 <Col xs={3} className="p-2 bg-light border-end h-100">
-                    <Card className="h-100">
+                    <Card className="mb-2" style={{ height: '25%' }}>
                         <Card.Body className="border rounded d-flex flex-column">
+                            <h5>Manual Coding</h5><hr/>
+                            <p className="text-muted">
+                                This page allows you to create themes and (optionally) create a manually coded sample to provide to the LLM.
+                            </p>
+                        </Card.Body>
+                    </Card>
+                    <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '74%' }}>
+                        <Card.Body className="border rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
                             {selectedEntry ? (
                                 <>
                                     <h5>Selected Entry</h5>
@@ -117,7 +125,12 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                                 <Button variant="outline-dark" disabled style={{ margin: '10px' }}>
                                     Responses: {dataset.length}
                                 </Button>
-                                <Button onClick={onAdvanceStage}>Review</Button>
+                                <Button 
+                                    onClick={onAdvanceStage} 
+                                    disabled={labels.length === 0}
+                                >
+                                    Review
+                                </Button>
                             </div>
                         </Card.Header>
                         <Card.Body style={{ height: '1px' }}>
