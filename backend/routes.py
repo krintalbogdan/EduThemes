@@ -107,6 +107,9 @@ def cleanup_expired_sessions():
 
     print(f"[Session Cleanup] Deleted {deleted} expired session(s)")
 
+    # TODO: Delete files associated with expired sessions
+
+
 def init_db():
     """
     HELPER: Initialize the DB and sessions table
@@ -129,7 +132,6 @@ def init_db():
         ''')
         conn.commit()
     
-    # TODO: Delete files associated with expired sessions
 
 def create_session():
     """
@@ -229,26 +231,22 @@ def upload_dataset(session_id):
         os.makedirs(preprocessed_folder, exist_ok=True)
         # preprocessed_file_path = os.path.join(preprocessed_folder, f"{session_id}_preprocessed.csv")
         preprocessed_file_path = os.path.join(preprocessed_folder, f"{filename}_preprocessed.csv")
-        # preprocessed_file_path = f"./data/processed/Test_question_preprocessed.csv"
-        svm_output_csv = os.path.join(preprocessed_folder, f"{filename}_svm_output.csv")
-        model_output_path = os.path.join(preprocessed_folder, f"{filename}_svm_model.pkl")
-        projection_csv = os.path.join(preprocessed_folder, f"{filename}_projection.csv")
 
         # run the pipeline
         run_pipeline_main(
             input_file=filepath,
-            svm_output_csv=svm_output_csv,
-            model_output_path=model_output_path,
-            projection_csv=projection_csv
+            svm_output_csv=os.path.join(preprocessed_folder, f"{filename}_svm_output.csv"),
+            model_output_path=os.path.join(preprocessed_folder, f"{filename}_svm_model.pkl"),
+            projection_csv=os.path.join(preprocessed_folder, f"{filename}_projection.csv")
         )
 
-        # Read the preprocessed dataset
+        # read the preprocessed dataset
         if os.path.exists(preprocessed_file_path):
             preprocessed_data = pd.read_csv(preprocessed_file_path)
             preprocessed_array = preprocessed_data.to_dict(orient='records')
         else:
-            preprocessed_array = []
-
+            raise FileNotFoundError(f"Preprocessed file not found at {preprocessed_file_path}")
+            
         # update session entry with dataset info
         update_session(session_id, 
             dataset_path=filepath, 

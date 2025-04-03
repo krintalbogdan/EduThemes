@@ -32,7 +32,7 @@ def preprocess_file(file_path, output_path):
         df = pd.read_excel(file_path)
     else:
         logging.error("Unsupported file format. Please use CSV or XLSX.")
-        sys.exit(1)
+        return
     
     logging.info(f"Loaded file {file_path} with shape {df.shape}")
     
@@ -54,7 +54,7 @@ def preprocess_file(file_path, output_path):
         os.makedirs(output_path)
     for question, df_proc in preprocessed.items():
         # safe_name = "".join([c if c.isalnum() else "_" for c in question])
-        file_name = file_path.split("/")[-1]
+        file_name = os.path.basename(file_path)
         out_file = os.path.join(output_path, f"{file_name}_preprocessed.csv")
         df_proc.to_csv(out_file, index=False)
         logging.info(f"Saved preprocessed data for '{question}' to {out_file}")
