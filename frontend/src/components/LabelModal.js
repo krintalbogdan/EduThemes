@@ -13,8 +13,8 @@ const LabelModal = ({ labels = [], setLabels }) => {
     const toggleShow = () => setShow(!show);
 
     const singleLabel = () => {
-        // ignore duplicates/blank labels
-        if (newLabel.trim() === '' || labels.some(label => label.name.toLowerCase() === newLabel.toLowerCase())) return;
+        // ignore duplicates/blank labels and limit to 10 labels
+        if (newLabel.trim() === '' || labels.some(label => label.name.toLowerCase() === newLabel.toLowerCase()) || labels.length >= 10) return;
 
         setLabels([...labels, { name: newLabel, color: selectedColor }]);
         setNewLabel('');
@@ -36,10 +36,9 @@ const LabelModal = ({ labels = [], setLabels }) => {
             const newLabels = [];
 
             rows.forEach(row => {
-                const [name] = row.split(',').map(item => item.trim());
-                // setNewLabel(name);
-                if (name && !(name.trim() === '' || labels.some(label => label.name.toLowerCase() === name.toLowerCase()))) {
-                    newLabels.push({ name, color: '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0') }); // https://stackoverflow.com/questions/5092808/how-do-i-randomly-generate-html-hex-color-codes-using-javascript
+                const [name] = row.split(',').map(item => item.trim()); // // https://stackoverflow.com/questions/5092808/how-do-i-randomly-generate-html-hex-color-codes-using-javascript
+                if (name && !(name.trim() === '' || labels.some(label => label.name.toLowerCase() === name.toLowerCase())) && (labels.length + newLabels.length < 10)) {
+                    newLabels.push({ name, color: '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0') });
                 }
             });
 

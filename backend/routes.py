@@ -1,37 +1,3 @@
-# @routes_bp.route('/', methods=['GET'])
-# def home():
-#     return jsonify({"message": "Default test"})
-
-# @routes_bp.route('/session/<session_id>/upload-dataset', methods=['POST'])
-# def upload_dataset(session_id):
-#     data = request.get_json()
-
-#     if 'dataset' not in data:
-#         return jsonify({"error": "Invalid dataset format"}), 400
-
-#     dataset = data['dataset']
-
-#     preprocessed_dataset = dataset  # add logic here
-
-#     return jsonify({
-#         "preprocessed_dataset": preprocessed_dataset
-#     })
-
-# # sana: create routes for each of the remaining endpoints as defined in the spec
-# # you don't need to implement any real functionality yet, just have it return a brief message for now (like in the 2 examples given)
-
-# @routes_bp.route('/session/<session_id>/upload-manual-coding', methods=['POST'])
-# def upload_manual_coding(session_id):
-#     if session_id not in sessions:
-#         return jsonify({"error": "Session not found"})
-
-#     data = request.get_json()
-#     if not data or "manual_coding" not in data:
-#         return jsonify({"error": "Invalid manual coding format"})
-
-#     sessions[session_id]["manual_coding"] = data["manual_coding"]
-#     return jsonify({"message": "Manual coding uploaded successfully"})
-
 # @routes_bp.route('/session/<session_id>/perform-analysis', methods=['POST'])
 # def perform_analysis(session_id):
 #     if session_id not in sessions:
@@ -81,8 +47,10 @@ from werkzeug.utils import secure_filename
 import uuid
 import sqlite3
 from datetime import datetime, timedelta
+import time
 import pandas as pd
 from run_pipeline import main as run_pipeline_main
+import json
 
 routes_bp = Blueprint('routes', __name__)
 
@@ -259,6 +227,46 @@ def upload_dataset(session_id):
             "session_id": session_id,
             "preprocessed_dataset": preprocessed_array
         })
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@routes_bp.route('/session/<session_id>/submit-manual-coding', methods=['POST'])
+def submit_manual_coding(session_id):
+    """
+    ROUTE: Submit manual coding and labels
+    """
+    try:
+        # validate session
+        cleanup_expired_sessions()
+        session = get_session(session_id)
+        if not session:
+            return jsonify({"error": "Invalid session"}), 400
+
+        data = request.get_json()
+        if not data or "labels" not in data or "manual_codings" not in data:
+            return jsonify({"error": "Invalid request body"}), 400
+
+        labels = data["labels"]
+        manual_codings = data["manual_codings"]
+
+        # save manual codings to a file
+        manual_coding_folder = os.path.join(UPLOAD_FOLDER, "manual_codings")
+        os.makedirs(manual_coding_folder, exist_ok=True)
+        manual_coding_file = os.path.join(manual_coding_folder, f"{session_id}_manual_coding.json")
+        with open(manual_coding_file, 'w') as f:
+            json.dump(manual_codings, f)
+
+        # update session with manual coding file path and labels
+        update_session(session_id, 
+            labels=json.dumps(labels), 
+            manual_coding=manual_coding_file,
+            status='MANUAL_CODING_SUBMITTED'
+        )
+
+        time.sleep(2) # simulate processing time
+
+        return jsonify({"message": "Manual coding and labels submitted successfully"})
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500

@@ -28,9 +28,9 @@ const Review = ({ sessionId, onAdvanceStage }) => {
     return (
         <Container fluid className="d-flex justify-content-center align-items-start p-0" style={{ padding: '0', height: '90vh' }}>
             <Row className="h-100 m-0 w-100 gap-3">
-            <Col xs={3} className="p-2 bg-light border-end h-100">
+                <Col xs={3} className="p-2 bg-light h-100">
                     <Card className="mb-2" style={{ height: '25%' }}>
-                        <Card.Body className="border rounded d-flex flex-column">
+                        <Card.Body className="rounded d-flex flex-column">
                             <h5>Batch Revision</h5><hr/>
                             <p className="text-muted">
                                 This page allows you to approve or reject the AI-generated codes for each entry. Responses were grouped by the SVM model and each group was coded by Claude.
@@ -38,7 +38,7 @@ const Review = ({ sessionId, onAdvanceStage }) => {
                         </Card.Body>
                     </Card>
                     <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '74%' }}>
-                        <Card.Body className="border rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
+                        <Card.Body className="rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
                             <p className="text-muted">
                                 (Will add visualizations from SVM here)
                             </p>

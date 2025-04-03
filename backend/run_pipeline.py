@@ -44,11 +44,11 @@ def main(input_file, svm_output_csv, model_output_path, projection_csv, selected
     logging.info(f"Selected question: {selected_question}")
     
     logging.info("Training SVM classifier on the selected question...")
-    train_svm_on_question(preprocessed_folder, input_file, selected_question, svm_output_csv, model_output_path, projection_csv)
+    # train_svm_on_question(preprocessed_folder, input_file, selected_question, svm_output_csv, model_output_path, projection_csv)
     
     # # STEP 3: Visualize Decision Boundary
     logging.info("Visualizing decision boundary...")
-    plot_decision_boundary(model_output_path, projection_csv, title=selected_question)
+    # plot_decision_boundary(model_output_path, projection_csv, title=selected_question)
     
     logging.info("Pipeline complete.")
 

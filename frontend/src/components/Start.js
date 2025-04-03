@@ -16,8 +16,8 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
     };
 
     const containerStyle = {
-        backgroundColor: '#e6d3b3',
-        minHeight: '100vh',
+        // backgroundColor: '#e6d3b3',
+        minHeight: '90vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -30,7 +30,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
         maxWidth: '900px',
         padding: '40px',
         borderRadius: '12px',
-        backgroundColor: '#fdf5e6',
+        // backgroundColor: '#fdf5e6',
         boxShadow: '8px 8px 0 black',
     };
 
@@ -74,7 +74,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
 
     return (
         <div style={containerStyle}>
-            <div style={windowStyle}>
+            <div style={windowStyle} class="bg-light">
                 <div style={titleStyle}>EduThemes</div>
                 <div style={{
                     fontSize: '16px',
@@ -104,6 +104,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
                         Start New Session
                     </Button>
                 </div>
+                <hr/>
                 <div>
                     <div style={sectionTitleStyle}>Features</div>
                     <div style={featuresStyle}>
@@ -125,6 +126,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
                         </div>
                     </div>
                 </div>
+                <hr/>
                 <div style={{
                     fontSize: '24px',
                     fontWeight: '600',

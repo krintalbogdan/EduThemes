@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Container, Button, Card, Row, Col, Form, Table, Badge } from 'react-bootstrap';
+import { Container, Spinner, Button, Card, Row, Col, Form, Table, Badge } from 'react-bootstrap';
 import LabelModal from './LabelModal';
+import axios from 'axios';
 
 const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
     const [selectedEntry, setSelectedEntry] = useState(null);
     const [selectedIndex, setSelectedIndex] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [labels, setLabels] = useState([]);
 
     const handleSelectEntry = (entry, index) => {
@@ -49,12 +51,36 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
         }));
     };
 
+    const handleReview = async () => {
+        setIsLoading(true);
+        try {
+            const manualCodings = dataset
+                .map((entry, index) => ({
+                    index,
+                    themes: entry.themes || [],
+                }))
+                .filter((entry) => entry.themes.length > 0);
+
+            const response = await axios.post(`http://localhost:1500/session/${sessionId}/submit-manual-coding`, {
+                labels,
+                manual_codings: manualCodings,
+            });
+
+            console.log(response.data.message);
+            onAdvanceStage();
+        } catch (error) {
+            console.error("Error submitting manual coding:", error.response?.data || error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <Container fluid className="d-flex justify-content-center align-items-start p-0" style={{ padding: '0', height: '90vh' }}>
             <Row className="h-100 m-0 w-100 gap-3">
-                <Col xs={3} className="p-2 bg-light border-end h-100">
+                <Col xs={3} className="p-2 bg-light h-100">
                     <Card className="mb-2" style={{ height: '25%' }}>
-                        <Card.Body className="border rounded d-flex flex-column">
+                        <Card.Body className="rounded d-flex flex-column">
                             <h5>Manual Coding</h5><hr/>
                             <p className="text-muted">
                                 This page allows you to create themes and (optionally) create a manually coded sample to provide to the LLM.
@@ -62,7 +88,7 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                         </Card.Body>
                     </Card>
                     <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '74%' }}>
-                        <Card.Body className="border rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
+                        <Card.Body className="rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
                             {selectedEntry ? (
                                 <>
                                     <h5>Selected Entry</h5>
@@ -126,10 +152,23 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                                     Responses: {dataset.length}
                                 </Button>
                                 <Button 
-                                    onClick={onAdvanceStage} 
-                                    disabled={labels.length === 0}
+                                    onClick={handleReview} 
+                                    disabled={labels.length === 0 || !sessionId || isLoading}
                                 >
-                                    Review
+                                    {isLoading ? (
+                            <>
+                                <Spinner 
+                                    as="span" 
+                                    animation="border" 
+                                    size="sm" 
+                                    role="status" 
+                                    aria-hidden="true" 
+                                /> 
+                                &nbsp;&nbsp;Processing...
+                            </>
+                        ) : (
+                            'Review'
+                        )}
                                 </Button>
                             </div>
                         </Card.Header>
