@@ -19,7 +19,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
 
     const containerStyle = {
         backgroundColor: '#e6d3b3',
-        minHeight: '100vh',
+        minHeight: '90vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -28,9 +28,9 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
 
     const windowStyle = {
         border: '4px solid black',
-        width: '90%',
+        width: '90vh',
         maxWidth: '900px',
-        padding: '40px',
+        padding: '35px',
         borderRadius: '12px',
         backgroundColor: '#fdf5e6',
         boxShadow: '8px 8px 0 black',

@@ -7,7 +7,6 @@
     border: none;
     outline: none;
     background: #dddddd;
-    cursor: pointer;
   }
   
   .pill:not(.pill--selected):hover {
