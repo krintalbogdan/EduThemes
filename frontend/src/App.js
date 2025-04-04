@@ -85,6 +85,8 @@ function App() {
           <div>
             <Analyze
             results={results}
+            sessionId={sessionId}
+            onAdvanceStage={() => handleAdvanceStage('start')}
             />
           </div>
         )}

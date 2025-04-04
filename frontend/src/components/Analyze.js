@@ -1,11 +1,32 @@
 import React, { useState } from "react";
 import { Button, Container } from "react-bootstrap";
-import { Chart as ChartJS, Title } from "chart.js/auto";
-import { Bar, Doughnut, Radar } from "react-chartjs-2";
+import { Bar, Doughnut } from "react-chartjs-2";
+import axios from "axios";
 import "./Analyze.css";
 import Chatbot from "./Chatbot";
 
-const Analyze = ({ results }) => {
+const Analyze = ({ results, onAdvanceStage, sessionId }) => {
+  const handleDownloadJSON = async () => {
+    try {
+      const response = await axios.get(`http://localhost:1500/session/${sessionId}/download-final-dataset`);
+      const data = response.data;
+
+      if (response.status === 200) {
+        const blob = new Blob([JSON.stringify(data.final_dataset, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "final_dataset.json";
+        link.click();
+        URL.revokeObjectURL(url);
+      } else {
+        console.error("Error downloading dataset:", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching dataset:", error);
+    }
+  };
+
   return (
     <div className="d-flex">
       <Container
@@ -85,21 +106,23 @@ const Analyze = ({ results }) => {
           
           <div
             fluid
-            className="bg-dark rounded-5 p-5 mb-5 button-container
-                "
+            className="bg-dark rounded-5 p-5 mb-5 button-container"
             style={{ width: "90%", height: "80%" }}
           >
-            {sourceData.map((item, index) => (
-              <button key={index} class="pill" type="button">
-                {item.label} - {item.value}
-
+            {results.map((item, index) => (
+              <button
+                key={index}
+                className="pill"
+                style={{ backgroundColor: item.color }}
+                type="button"
+              >
+                {item.name} - {item.frequency}
               </button>
             ))}
-
           </div>
           <div className="d-flex gap-5" style={{ width: "90%", height: "10%" }}>
-            <Button className="rounded-5 w-50 h-10">
-              <span className="size-3">Download CSV</span>
+            <Button className="rounded-5 w-50 h-10" onClick={handleDownloadJSON}>
+              <span className="size-3">Download JSON</span>
             </Button>
             <Button className="rounded-5 w-50 h-10">
               <span>Return</span>

@@ -370,3 +370,30 @@ def submit_final_dataset(session_id):
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+@routes_bp.route('/session/<session_id>/download-final-dataset', methods=['GET'])
+def download_final_dataset(session_id):
+    """
+    ROUTE: Download the final dataset as JSON
+    """
+    try:
+        # validate session
+        cleanup_expired_sessions()
+        session = get_session(session_id)
+        if not session:
+            return jsonify({"error": "Invalid session"}), 400
+
+        final_dataset_path = os.path.join(UPLOAD_FOLDER, f"{session_id}_final_dataset.json")
+        if not os.path.exists(final_dataset_path):
+            return jsonify({"error": "Final dataset not found"}), 404
+
+        with open(final_dataset_path, 'r') as f:
+            final_dataset = json.load(f)
+
+        return jsonify({
+            "message": "Final dataset retrieved successfully.",
+            "final_dataset": final_dataset
+        })
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
