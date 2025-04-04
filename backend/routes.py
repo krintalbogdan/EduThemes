@@ -98,7 +98,7 @@ def create_session():
     from datetime import datetime, timedelta
 
     session_id = str(uuid.uuid4())
-    expires_at = datetime.now() + timedelta(minutes=1)
+    expires_at = datetime.now() + timedelta(minutes=30)
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -123,7 +123,7 @@ def update_session(session_id, **kwargs):
         update_fields.append(f"{key} = ?")
         values.append(value)
     
-    expires_at = datetime.now() + timedelta(minutes=1)
+    expires_at = datetime.now() + timedelta(minutes=30)
     update_fields.append("expires_at = ?")
     values.append(expires_at)
 
