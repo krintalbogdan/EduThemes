@@ -11,7 +11,10 @@ function App() {
   const [sessionId, setSessionId] = useState(null);
   const [dataset, setDataset] = useState(null);
   const [visualization, setVisualization] = useState(null);
+  const [labels, setLabels] = useState([]);
   const [currentStage, setCurrentStage] = useState('start'); // stages: start screen, upload dataset, preview dataset, review, results
+  const [claudeData, setClaudeData] = useState(null);
+  const [svmData, setSvmData] = useState(null);
 
   const handleSessionStart = (newSessionId) => {
     setSessionId(newSessionId);
@@ -46,6 +49,12 @@ function App() {
             <Preview 
               sessionId={sessionId}
               dataset={dataset}
+              labels={labels}
+              setLabels={setLabels}
+              claudeData={claudeData}
+              setClaudeData={setClaudeData}
+              svmData={svmData}
+              setSvmData={setSvmData}
               setDataset={setDataset}
               onAdvanceStage={() => handleAdvanceStage('review')} 
             />
@@ -57,6 +66,11 @@ function App() {
             <Review 
               sessionId={sessionId}
               visualization={visualization}
+              labels={labels}
+              claudeData={claudeData}
+              dataset={dataset}
+              setDataset={setDataset}
+              svmData={svmData}
               onAdvanceStage={() => handleAdvanceStage('results')} 
             />
           </div>

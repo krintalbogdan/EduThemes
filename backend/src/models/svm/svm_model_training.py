@@ -34,7 +34,7 @@ def generate_cluster_title(texts):
     return most_common.capitalize()
 
 def train_svm_on_question(preprocessed_folder, input_file, question, svm_output_csv, model_output_path, projection_csv,
-                          gamma_kernel=0.5, similarity_threshold=0.8, kpca_gamma=0.1):
+                          gamma_kernel=0.5, similarity_threshold=0.7, kpca_gamma=0.1):
     """
     Loads the preprocessed CSV for the given survey question, vectorizes the cleaned responses,
     clusters them using an RBF kernel approach to obtain pseudo‑labels, projects the high‑dimensional
@@ -81,22 +81,27 @@ def train_svm_on_question(preprocessed_folder, input_file, question, svm_output_
     predictions = svc.predict(X_2d)
     df_proc['svm_label'] = predictions
     
-    # Organize output for CSV classification (first row: question, second row: cluster titles, then responses)
-    clusters = {}
-    for cluster in sorted(set(predictions)):
-        cluster_texts = df_proc[df_proc['svm_label'] == cluster]['original'].tolist()
-        title = generate_cluster_title(" ".join(cluster_texts))
-        clusters[cluster] = {'title': f"Class {cluster+1}: {title}", 'responses': cluster_texts}
+    # # Organize output for CSV classification (first row: question, second row: cluster titles, then responses)
+    # clusters = {}
+    # for cluster in sorted(set(predictions)):
+    #     cluster_texts = df_proc[df_proc['svm_label'] == cluster]['original'].tolist()
+    #     title = generate_cluster_title(" ".join(cluster_texts))
+    #     clusters[cluster] = {'title': f"Class {cluster+1}: {title}", 'responses': cluster_texts}
     
-    max_len = max(len(info['responses']) for info in clusters.values())
-    data = {}
-    for cluster, info in clusters.items():
-        col = [info['title']] + info['responses'] + [''] * (max_len - len(info['responses']))
-        data[f"Class {cluster+1}"] = col
-    out_df = pd.DataFrame(data)
-    question_row = {col: question for col in out_df.columns}
-    out_df = pd.concat([pd.DataFrame([question_row]), out_df], ignore_index=True)
-    out_df.to_csv(svm_output_csv, index=False)
+    # max_len = max(len(info['responses']) for info in clusters.values())
+    # data = {}
+    # for cluster, info in clusters.items():
+    #     col = [info['title']] + info['responses'] + [''] * (max_len - len(info['responses']))
+    #     data[f"Class {cluster+1}"] = col
+    # out_df = pd.DataFrame(data)
+    # question_row = {col: question for col in out_df.columns}
+    # out_df = pd.concat([pd.DataFrame([question_row]), out_df], ignore_index=True)
+    # out_df.to_csv(svm_output_csv, index=False)
+    # Organize output for CSV classification in the required format
+    df_proc['class_letter'] = df_proc['svm_label'].apply(lambda x: chr((x % 12)+65))  # Map to letters
+    output_data = df_proc[['original', 'class_letter']].reset_index()  # Include original index
+    output_data.rename(columns={'index': 'original_entry_index', 'original': 'response'}, inplace=True)
+    output_data.to_csv(svm_output_csv, index=False)
     logging.info(f"Saved SVM classification output to {svm_output_csv}")
 
 if __name__ == '__main__':

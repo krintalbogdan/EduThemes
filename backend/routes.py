@@ -123,6 +123,7 @@ def create_session():
     
     return session_id
 
+
 def update_session(session_id, **kwargs):
     """
     HELPER: Update session details
@@ -152,6 +153,7 @@ def update_session(session_id, **kwargs):
             cursor.execute(query, values)
             conn.commit()
 
+
 def get_session(session_id):
     """
     HELPER: Get session details
@@ -160,7 +162,8 @@ def get_session(session_id):
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM sessions WHERE id = ?', (session_id,))
-        return cursor.fetchone()
+        return cursor.fetchone() 
+
 
 @routes_bp.route('/session/start', methods=['POST'])
 def start_session():
@@ -272,9 +275,52 @@ def submit_manual_coding(session_id):
             status='MANUAL_CODING_SUBMITTED'
         )
 
+        # call Claude API for classifying
+        session = get_session(session_id)
+        filename = session['dataset_filename']
+
+        # access the SVM output CSV file and group by class letter
+        svm_output_csv = os.path.join(UPLOAD_FOLDER, "svm_processed", f"{filename}_svm_output.csv")
+        if not os.path.exists(svm_output_csv):
+            raise FileNotFoundError(f"SVM output file not found at {svm_output_csv}")
+
+        df_svm_output = pd.read_csv(svm_output_csv)
+        svm_data = df_svm_output[['original_entry_index', 'class_letter']].to_dict(orient='records')
+
+        # Group SVM data by class letter
+        grouped_svm_data = {}
+        for entry in svm_data:
+            class_letter = entry['class_letter']
+            if class_letter not in grouped_svm_data:
+                grouped_svm_data[class_letter] = []
+            grouped_svm_data[class_letter].append(entry['original_entry_index'])
+
+        # Claude test data
+        claude_data = {
+            "A": ["access to info", "tutoring", "explaining"],
+            "B": ["access to info", "explaining", "tutoring"],
+            "C": ["access to info", "explaining", "speed up work"],
+            "D": ["access to info", "explaining", "writing support", "tutoring"],
+            "E": ["access to info", "explaining", "speed up work"],
+            "F": ["access to info", "explaining"],
+            "G": ["tutoring", "explaining", "access to info"],
+            "H": ["personalization", "tutoring", "speed up work", "explaining"],
+            "I": ["access to info", "tutoring", "explaining"],
+            "J": ["access to info", "accessibility", "personalization"],
+            "K": ["access to info", "explaining", "speed up work"],
+            "L": ["access to info", "speed up work", "explaining", "writing support"]
+        }
+
         time.sleep(2) # simulate processing time
 
-        return jsonify({"message": "Manual coding and labels submitted successfully"})
+        # print(svm_data)
+        # print(claude_test_data)
+
+        return jsonify({
+            "message": "Manual coding submitted successfully.",
+            "svm_data": grouped_svm_data,
+            "claude_data": claude_data
+        })
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500

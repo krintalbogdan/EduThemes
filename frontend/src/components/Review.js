@@ -1,30 +1,90 @@
-import React, { useState } from 'react';
-import { Container, Button, Card, Row, Col, Modal } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Button, Card, Row, Col, Modal, Badge } from 'react-bootstrap';
 import { FaCheck, FaTimes, FaUndo } from 'react-icons/fa';
 
-const Review = ({ sessionId, visualization, onAdvanceStage }) => {
-    const [actions, setActions] = useState(Array(15).fill(null)); 
+const Review = ({ sessionId, labels, dataset, setDataset, visualization, claudeData, svmData, onAdvanceStage }) => {
+    const [groupActions, setGroupActions] = useState({});
     const [showModal, setShowModal] = useState(false);
+    const [rejectedEntries, setRejectedEntries] = useState([]);
+    const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
+    const [showReassignModal, setShowReassignModal] = useState(false);
+    const [reassignThemes, setReassignThemes] = useState({});
+
+    const groupKeys = svmData ? Object.keys(svmData) : [];
+    if (!svmData || !claudeData || groupKeys.length === 0) {
+        console.log("svmData or claudeData is missing or empty:", { svmData, claudeData }); // debugging log
+    }
+    const currentGroup = groupKeys[currentGroupIndex];
+    const currentThemes = claudeData ? claudeData[currentGroup] : [];
+    const currentIndices = svmData ? svmData[currentGroup] : [];
+    const currentActions = groupActions[currentGroup] || Array(currentIndices.length).fill(null);
+
+    useEffect(() => {
+        if (!groupActions[currentGroup]) {
+            setGroupActions((prev) => ({
+                ...prev,
+                [currentGroup]: Array(currentIndices.length).fill(null),
+            }));
+        }
+    }, [currentGroup, currentIndices, groupActions]);
 
     const handleAction = (index, action) => {
-        const updatedActions = [...actions];
+        const updatedActions = [...currentActions];
         updatedActions[index] = action;
-        setActions(updatedActions);
+        setGroupActions((prev) => ({
+            ...prev,
+            [currentGroup]: updatedActions,
+        }));
     };
 
     const handleUndo = (index) => {
-        const updatedActions = [...actions];
+        const updatedActions = [...currentActions];
         updatedActions[index] = null;
-        setActions(updatedActions);
+        setGroupActions((prev) => ({
+            ...prev,
+            [currentGroup]: updatedActions,
+        }));
     };
 
     const handleAcceptAll = () => {
-        setActions(Array(15).fill('approve'));
+        setGroupActions((prev) => ({
+            ...prev,
+            [currentGroup]: Array(currentIndices.length).fill('approve'),
+        }));
     };
 
     const handleRejectAll = () => {
-        setActions(Array(15).fill('deny'));
+        setGroupActions((prev) => ({
+            ...prev,
+            [currentGroup]: Array(currentIndices.length).fill('deny'),
+        }));
     };
+
+    const handleSaveReassignThemes = () => {
+        // console.log("Reassigned themes:", reassignThemes);
+        console.log(dataset);
+        handleAcceptAll();
+        setShowReassignModal(false);
+        setCurrentGroupIndex(currentGroupIndex + 1);
+    };
+
+    const handleNextGroup = () => {
+        // if (currentGroupIndex < groupKeys.length - 1) {
+        const rejectedIndices = currentActions
+            .map((action, idx) => (action === 'deny' ? currentIndices[idx] : null))
+            .filter((index) => index !== null);
+
+        if (rejectedIndices.length > 0) {
+            setRejectedEntries(rejectedIndices);
+            setShowReassignModal(true);
+        } else if (currentGroupIndex < groupKeys.length - 1) {
+            setCurrentGroupIndex(currentGroupIndex + 1);
+        } else {
+            onAdvanceStage('results');
+        }
+    };
+
+    const allActionsCompleted = currentActions.every((action) => action !== null);
 
     return (
         <Container fluid className="d-flex justify-content-center align-items-start p-0" style={{ padding: '0', height: '90vh' }}>
@@ -41,9 +101,15 @@ const Review = ({ sessionId, visualization, onAdvanceStage }) => {
                     <Card className="mb-2" style={{ height: '39%' }}>
                         <Card.Body className="rounded d-flex flex-column">
                             <strong>Assigned Themes</strong><hr/>
-                            <p className="text-muted">
-                                This page allows you to approve or reject the AI-generated codes for each entry. Responses were grouped by the SVM model and each group was coded by Claude.
-                            </p>
+                            {currentThemes.length > 0 ? (
+                                <ul>
+                                    {currentThemes.map((theme, index) => (
+                                        <li key={index}>{theme}</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-muted">No themes assigned for this group.</p>
+                            )}
                         </Card.Body>
                     </Card>
                     <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '34%' }}>
@@ -65,11 +131,14 @@ const Review = ({ sessionId, visualization, onAdvanceStage }) => {
                     <Card className="flex-grow-1">
                         <Card.Header className="d-flex flex-column align-items-center">
                             <div className="d-flex justify-content-between w-100 mt-2 align-items-center">
-                                <Button variant="primary" disabled onClick={handleRejectAll}>
-                                    Back
-                                </Button>
-                                <h6>Group 1 of 10</h6>
-                                <Button variant="primary" disabled onClick={handleRejectAll}>
+                                <h5>
+                                    Group {groupKeys.length > 0 ? currentGroupIndex + 1 : 0} of {groupKeys.length}
+                                </h5>
+                                <Button 
+                                    variant="primary" 
+                                    onClick={handleNextGroup} 
+                                    disabled={!allActionsCompleted}
+                                >
                                     Next
                                 </Button>
                             </div>
@@ -87,53 +156,59 @@ const Review = ({ sessionId, visualization, onAdvanceStage }) => {
                                 style={{ overflowY: 'auto', width: '100%', padding: '10px', height: '100%' }}
                                 className="bg-light border rounded"
                             >
-                                {[...Array(15)].map((_, index) => (
-                                    <div 
-                                        key={index} 
-                                        className={`p-2 border-bottom d-flex justify-content-between align-items-center`}
-                                        style={{ 
-                                            textAlign: 'left', 
-                                            backgroundColor: actions[index] === 'approve' ? '#d4edda' : actions[index] === 'deny' ? '#f8d7da' : 'transparent' 
-                                        }}
-                                    >
-                                        <span>{index + 1}: Some example text here.</span>
+                                {currentIndices.length > 0 ? (
+                                    currentIndices.map((index, idx) => (
                                         <div 
-                                            className="d-flex flex-column" 
-                                            style={{ height: '60px', justifyContent: actions[index] === null ? 'space-between' : 'center' }}
+                                            key={index} 
+                                            className={`p-2 border-bottom d-flex justify-content-between align-items-center`}
+                                            style={{ 
+                                                textAlign: 'left', 
+                                                backgroundColor: currentActions[idx] === 'approve' ? '#d4edda' : currentActions[idx] === 'deny' ? '#f8d7da' : 'transparent' 
+                                            }}
                                         >
-                                            {actions[index] === null && (
-                                                <>
+                                            <span>
+                                                {dataset[index]?.original || "No text available"}
+                                            </span>
+                                            <div 
+                                                className="d-flex flex-column" 
+                                                style={{ height: '60px', justifyContent: currentActions[idx] === null ? 'space-between' : 'center' }}
+                                            >
+                                                {currentActions[idx] === null && (
+                                                    <>
+                                                        <Button 
+                                                            variant="success" 
+                                                            className="d-flex align-items-center" 
+                                                            size="sm"
+                                                            onClick={() => handleAction(idx, 'approve')}
+                                                        >
+                                                            <FaCheck/>
+                                                        </Button>
+                                                        <Button 
+                                                            variant="danger" 
+                                                            className="d-flex align-items-center" 
+                                                            size="sm"
+                                                            onClick={() => handleAction(idx, 'deny')}
+                                                        >
+                                                            <FaTimes/>
+                                                        </Button>
+                                                    </>
+                                                )}
+                                                {currentActions[idx] !== null && (
                                                     <Button 
-                                                        variant="success" 
+                                                        variant="secondary" 
                                                         className="d-flex align-items-center" 
                                                         size="sm"
-                                                        onClick={() => handleAction(index, 'approve')}
+                                                        onClick={() => handleUndo(idx)}
                                                     >
-                                                        <FaCheck/>
+                                                        <FaUndo/>
                                                     </Button>
-                                                    <Button 
-                                                        variant="danger" 
-                                                        className="d-flex align-items-center" 
-                                                        size="sm"
-                                                        onClick={() => handleAction(index, 'deny')}
-                                                    >
-                                                        <FaTimes/>
-                                                    </Button>
-                                                </>
-                                            )}
-                                            {actions[index] !== null && (
-                                                <Button 
-                                                    variant="secondary" 
-                                                    className="d-flex align-items-center" 
-                                                    size="sm"
-                                                    onClick={() => handleUndo(index)}
-                                                >
-                                                    <FaUndo/>
-                                                </Button>
-                                            )}
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                ) : (
+                                    <p className="text-muted">No entries in this group.</p>
+                                )}
                             </div>
                         </Card.Body>
                     </Card>
@@ -148,11 +223,86 @@ const Review = ({ sessionId, visualization, onAdvanceStage }) => {
                     {visualization && (
                         <img 
                             src={`data:image/png;base64,${visualization}`} 
-                            alt="Visualization Enlarged" 
+                            alt="Decision Boundary" 
                             style={{ width: '100%', height: 'auto' }} 
                         />
                     )}
                 </Modal.Body>
+            </Modal>
+
+            <Modal show={showReassignModal} onHide={() => setShowReassignModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Reassign Themes</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {rejectedEntries.length > 0 ? (
+                        rejectedEntries.map((entryIndex, idx) => (
+                            <div key={idx} className="mb-3">
+                                <strong>Entry:</strong>
+                                <p>{dataset[entryIndex]?.original || "No text available"}</p>
+                                <div className="mb-2">
+                                    {dataset[entryIndex]?.themes?.map((theme, index) => (
+                                        <Badge
+                                            key={index}
+                                            bg={null}
+                                            style={{
+                                                backgroundColor: labels.find(label => label.name === theme.name)?.color || '#0d6efd',
+                                                marginRight: '5px',
+                                                cursor: 'pointer',
+                                            }}
+                                            onClick={() => {
+                                                const updatedThemes = dataset[entryIndex].themes.filter((t) => t.name !== theme.name);
+                                                const updatedDataset = [...dataset];
+                                                updatedDataset[entryIndex].themes = updatedThemes;
+                                                setDataset(updatedDataset);
+                                            }}
+                                        >
+                                            {theme.name} ×
+                                        </Badge>
+                                    ))}
+                                </div>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Enter new theme"
+                                    value={reassignThemes[entryIndex] || ""}
+                                    onChange={(e) => {
+                                        const newThemeName = e.target.value.trim();
+                                        const label = labels.find((label) => label.name === newThemeName);
+                                        if (label && !dataset[entryIndex].themes?.some((t) => t.name === newThemeName)) {
+                                            const newTheme = { name: newThemeName, color: label.color };
+                                            const updatedDataset = [...dataset];
+                                            updatedDataset[entryIndex].themes = [
+                                                ...(updatedDataset[entryIndex].themes || []),
+                                                newTheme,
+                                            ];
+                                            setDataset(updatedDataset);
+                                            setReassignThemes((prev) => ({ ...prev, [entryIndex]: "" }));
+                                        } else {
+                                            setReassignThemes((prev) => ({ ...prev, [entryIndex]: newThemeName }));
+                                        }
+                                    }}
+                                    list="theme-options"
+                                />
+                                <datalist id="theme-options">
+                                    {labels.map((label, index) => (
+                                        <option key={index} value={label.name} />
+                                    ))}
+                                </datalist>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-muted">No rejected entries to reassign themes for.</p>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowReassignModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleSaveReassignThemes}>
+                        Next Group
+                    </Button>
+                </Modal.Footer>
             </Modal>
         </Container>
     );

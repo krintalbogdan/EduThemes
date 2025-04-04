@@ -34,3 +34,6 @@ frontend/.pnp
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+backend/sorted_and_formatted_output.txt
+backend/sort_and_format_svm_output.py
+backend/src/models/svm/test.txt

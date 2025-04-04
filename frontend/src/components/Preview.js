@@ -3,11 +3,10 @@ import { Container, Spinner, Button, Card, Row, Col, Form, Table, Badge } from '
 import LabelModal from './LabelModal';
 import axios from 'axios';
 
-const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
+const Preview = ({ sessionId, dataset, setDataset, labels, setLabels, claudeData, svmData, setClaudeData, setSvmData, onAdvanceStage }) => {
     const [selectedEntry, setSelectedEntry] = useState(null);
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [labels, setLabels] = useState([]);
 
     const handleSelectEntry = (entry, index) => {
         if (index === selectedIndex) {
@@ -66,13 +65,32 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                 manual_codings: manualCodings,
             });
 
-            console.log(response.data.message);
+            console.log(response.data);
+            setClaudeData(response.data.claude_test_data);
+            setSvmData(response.data.svm_data);
+            assignThemesFromSVMData(response.data.svm_data, response.data.claude_test_data);
             onAdvanceStage();
         } catch (error) {
             console.error("Error submitting manual coding:", error.response?.data || error.message);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const assignThemesFromSVMData = (svmData, claudeData) => {
+        const updatedDataset = [...dataset];
+        Object.entries(svmData).forEach(([group, indices]) => {
+            const themes = claudeData[group];
+            indices.forEach((index) => {
+                if (updatedDataset[index]) {
+                    updatedDataset[index].themes = themes.map((theme) => {
+                        const label = labels.find((label) => label.name === theme);
+                        return { name: theme, color: label?.color || '#0d6efd' };
+                    });
+                }
+            });
+        });
+        setDataset(updatedDataset);
     };
 
     return (
