@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Button, Container } from 'react-bootstrap';
+import { Button, Container, Offcanvas } from 'react-bootstrap';
+import { Chart as ChartJS, Title} from 'chart.js/auto';
+import { Bar, Doughnut, Radar } from 'react-chartjs-2';
 import axios from 'axios';
 import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa'; //from react icons, for the features icons
 
@@ -26,9 +28,9 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
 
     const windowStyle = {
         border: '4px solid black',
-        width: '90%',
+        width: '90vh',
         maxWidth: '900px',
-        padding: '40px',
+        padding: '35px',
         borderRadius: '12px',
         // backgroundColor: '#fdf5e6',
         boxShadow: '8px 8px 0 black',

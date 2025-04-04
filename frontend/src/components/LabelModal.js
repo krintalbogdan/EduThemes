@@ -11,7 +11,7 @@ const LabelModal = ({ labels = [], setLabels }) => {
     const [show, setShow] = useState(true);
 
     const toggleShow = () => setShow(!show);
-
+ 
     const singleLabel = () => {
         // ignore duplicates/blank labels and limit to 10 labels
         if (newLabel.trim() === '' || labels.some(label => label.name.toLowerCase() === newLabel.toLowerCase()) || labels.length >= 10) return;
@@ -47,6 +47,7 @@ const LabelModal = ({ labels = [], setLabels }) => {
     };
 
     // TODO: allow users to recolor existing labels
+
     return (
         <>
             <Button variant="primary" onClick={toggleShow}>Edit Themes</Button>
@@ -56,6 +57,7 @@ const LabelModal = ({ labels = [], setLabels }) => {
                     <Modal.Title>Themes</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    
                     <Form className="mb-2 d-flex gap-2">
                         <Form.Control
                             type="text"
