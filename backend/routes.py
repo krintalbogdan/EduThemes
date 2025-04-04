@@ -1,27 +1,3 @@
-# @routes_bp.route('/session/<session_id>/perform-analysis', methods=['POST'])
-# def perform_analysis(session_id):
-#     if session_id not in sessions:
-#         return jsonify({"error": "Session not found"})
-
-#     data = request.get_json()
-#     if not data or "model_choice" not in data:
-#         return jsonify({"error": "Invalid model choice"})
-
-#     analysis_results = {"summary": "Placeholder results"}  # just a placeholder
-#     sessions[session_id]["analysis_results"] = analysis_results
-#     return jsonify({"analysis_results": analysis_results})
-
-# @routes_bp.route('/session/<session_id>/get-results', methods=['GET'])
-# def get_results(session_id):
-#     if session_id not in sessions:
-#         return jsonify({"error": "Session not found"})
-
-#     return jsonify({
-#         "preprocessed_dataset": sessions[session_id].get("dataset", []),
-#         "labels": sessions[session_id].get("labels", []),
-#         "analysis_results": sessions[session_id].get("analysis_results", {}),
-#     })
-
 # # template (replace the {} with appropriate values):
 # # @routes_bp.route('/session/<session_id>/{put endpoint name here}', methods=['{put post/get/put here}'])
 # # def {operation id in snake_case}(session_id):
@@ -62,7 +38,7 @@ DATABASE = 'sessions.db'
 
 def cleanup_expired_sessions():
     """
-    HELPER: Delete expired sessions
+    HELPER: Delete expired sessions and associated files
     """
     now = datetime.now()
 
@@ -70,14 +46,26 @@ def cleanup_expired_sessions():
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
+        cursor.execute("SELECT id FROM sessions WHERE expires_at <= ?", (now,))
+        expired_sessions = [row[0] for row in cursor.fetchall()]
+
         cursor.execute("DELETE FROM sessions WHERE expires_at <= ?", (now,))
         deleted = cursor.rowcount
         conn.commit()
 
     print(f"[Session Cleanup] Deleted {deleted} expired session(s)")
 
-    # TODO: Delete files associated with expired sessions
-
+    # delete files associated with expired sessions
+    for session_id in expired_sessions:
+        for root, _, files in os.walk(UPLOAD_FOLDER):
+            for file in files:
+                if file.startswith(session_id):
+                    file_path = os.path.join(root, file)
+                    try:
+                        os.remove(file_path)
+                        print(f"Deleted file: {file_path}")
+                    except Exception as e:
+                        print(f"Error deleting file {file_path}: {e}")
 
 def init_db():
     """
@@ -110,7 +98,7 @@ def create_session():
     from datetime import datetime, timedelta
 
     session_id = str(uuid.uuid4())
-    expires_at = datetime.now() + timedelta(minutes=30)
+    expires_at = datetime.now() + timedelta(minutes=1)
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -135,7 +123,7 @@ def update_session(session_id, **kwargs):
         update_fields.append(f"{key} = ?")
         values.append(value)
     
-    expires_at = datetime.now() + timedelta(minutes=30)
+    expires_at = datetime.now() + timedelta(minutes=1)
     update_fields.append("expires_at = ?")
     values.append(expires_at)
 
