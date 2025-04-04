@@ -4,7 +4,6 @@ import { Chart as ChartJS, Title } from "chart.js/auto";
 import { Bar, Doughnut, Radar } from "react-chartjs-2";
 import "./Analyze.css";
 import sourceData from "../Test_Data/source.json";
-import Chatbot from "./Chatbot";
 
 const Analyze = () => {
   return (
@@ -96,60 +95,24 @@ const Analyze = () => {
           className="bg-light rounded-5 d-flex flex-column justify-content-center align-items-center p-4"
           style={{ width: "50%", height: "90%" }}
         >
-          <Container
+          <div>
+            Tags
+          </div>
+          
+          <div
             fluid
-            className="bg-dark rounded-5 p-5 text-white mb-5 
-                        flex flex-wrap gap-3 "
+            className="bg-dark rounded-5 p-5 mb-5 button-container
+                "
             style={{ width: "90%", height: "80%" }}
           >
-            <button class="pill">Happy</button>
-            <button class="pill">Happy</button>
-            <button class="pill" type="button">
-              Happy
-            </button>
-            <button class="pill" type="button">
-              Happy
-            </button>
-            <button class="pill" type="button">
-              Happy
-            </button>
-            <button class="pill" type="button">
-              Happy
-            </button>
-            <button class="pill" type="button">
-              Happy
-            </button>
-            <button class="pill" type="button">
-              ETC
-            </button>
-            <button class="pill" type="button">
-              Engaged
-            </button>
-            <button class="pill" type="button">
-              Something
-            </button>
-            <button class="pill" type="button">
-              name
-            </button>
-            <button class="pill" type="button">
-              Happy
-            </button>
-            <button class="pill" type="button">
-              Happy
-            </button>
-            <button class="pill" type="button">
-              ETC
-            </button>
-            <button class="pill" type="button">
-              Engaged
-            </button>
-            <button class="pill" type="button">
-              Something
-            </button>
-            <button class="pill" type="button">
-              name
-            </button>
-          </Container>
+            {sourceData.map((item, index) => (
+              <button key={index} class="pill" type="button">
+                {item.label} - {item.value}
+
+              </button>
+            ))}
+
+          </div>
           <div className="d-flex gap-5" style={{ width: "90%", height: "10%" }}>
             <Button className="rounded-5 w-50 h-10">
               <span className="size-3">Download CSV</span>
