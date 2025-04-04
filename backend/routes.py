@@ -324,3 +324,49 @@ def submit_manual_coding(session_id):
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+@routes_bp.route('/session/<session_id>/submit-final-dataset', methods=['POST'])
+def submit_final_dataset(session_id):
+    """
+    ROUTE: Submit the final dataset and calculate theme frequencies
+    """
+    try:
+        # Validate session
+        cleanup_expired_sessions()
+        session = get_session(session_id)
+        if not session:
+            return jsonify({"error": "Invalid session"}), 400
+
+        data = request.get_json()
+        if not data or "dataset" not in data:
+            return jsonify({"error": "Invalid request body"}), 400
+
+        dataset = data["dataset"]
+
+        # Calculate theme frequencies
+        theme_counts = {}
+        for entry in dataset:
+            for theme in entry.get("themes", []):
+                theme_name = theme["name"]
+                theme_color = theme["color"]
+                if theme_name not in theme_counts:
+                    theme_counts[theme_name] = {"name": theme_name, "color": theme_color, "frequency": 0}
+                theme_counts[theme_name]["frequency"] += 1
+
+        # Save the final dataset and theme frequencies to the session
+        final_dataset_path = os.path.join(UPLOAD_FOLDER, f"{session_id}_final_dataset.json")
+        with open(final_dataset_path, 'w') as f:
+            json.dump(dataset, f)
+
+        update_session(session_id, 
+            analysis_results=json.dumps(list(theme_counts.values())),
+            status='FINAL_DATASET_SUBMITTED'
+        )
+
+        return jsonify({
+            "message": "Final dataset submitted successfully.",
+            "themes": list(theme_counts.values())
+        })
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": str(e)}), 500

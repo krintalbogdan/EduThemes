@@ -66,9 +66,9 @@ const Preview = ({ sessionId, dataset, setDataset, labels, setLabels, claudeData
             });
 
             console.log(response.data);
-            setClaudeData(response.data.claude_test_data);
+            setClaudeData(response.data.claude_data);
             setSvmData(response.data.svm_data);
-            assignThemesFromSVMData(response.data.svm_data, response.data.claude_test_data);
+            assignThemesFromSVMData(response.data.svm_data, response.data.claude_data);
             onAdvanceStage();
         } catch (error) {
             console.error("Error submitting manual coding:", error.response?.data || error.message);

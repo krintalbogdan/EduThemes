@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Button, Card, Row, Col, Modal, Badge } from 'react-bootstrap';
 import { FaCheck, FaTimes, FaUndo } from 'react-icons/fa';
+import axios from 'axios';
 
 const Review = ({ sessionId, labels, dataset, setDataset, visualization, claudeData, svmData, onAdvanceStage }) => {
     const [groupActions, setGroupActions] = useState({});
@@ -68,8 +69,7 @@ const Review = ({ sessionId, labels, dataset, setDataset, visualization, claudeD
         setCurrentGroupIndex(currentGroupIndex + 1);
     };
 
-    const handleNextGroup = () => {
-        // if (currentGroupIndex < groupKeys.length - 1) {
+    const handleNextGroup = async () => {
         const rejectedIndices = currentActions
             .map((action, idx) => (action === 'deny' ? currentIndices[idx] : null))
             .filter((index) => index !== null);
@@ -80,7 +80,17 @@ const Review = ({ sessionId, labels, dataset, setDataset, visualization, claudeD
         } else if (currentGroupIndex < groupKeys.length - 1) {
             setCurrentGroupIndex(currentGroupIndex + 1);
         } else {
-            onAdvanceStage('results');
+            try {
+                const response = await axios.post(`http://localhost:1500/session/${sessionId}/submit-final-dataset`, { dataset });
+                if (response.status === 200) {
+                    console.log(response.data);
+                    onAdvanceStage('results');
+                } else {
+                    console.error('Error submitting final dataset:', response.data.error);
+                }
+            } catch (error) {
+                console.error('Error submitting final dataset:', error);
+            }
         }
     };
 
