@@ -3,10 +3,9 @@ import { Button, Container } from "react-bootstrap";
 import { Chart as ChartJS, Title } from "chart.js/auto";
 import { Bar, Doughnut, Radar } from "react-chartjs-2";
 import "./Analyze.css";
-import sourceData from "../Test_Data/source.json";
 import Chatbot from "./Chatbot";
 
-const Analyze = () => {
+const Analyze = ({ results }) => {
   return (
     <div className="d-flex">
       <Container
@@ -23,21 +22,13 @@ const Analyze = () => {
           >
             <Doughnut
               data={{
-                labels: sourceData.map((item) => item.label),
+                labels: results.map((item) => item.name),
                 datasets: [
                   {
                     label: "Count",
-                    data: sourceData.map((item) => item.value),
-                    backgroundColor: [
-                      "rgba(43, 63, 229, 0.8)",
-                      "rgba(150, 185, 67, 0.8)",
-                      "rgba(180, 42, 42, 0.8)",
-                    ],
-                    borderColor: [
-                      "rgba(43, 63, 229, 0.8)",
-                      "rgba(150, 185, 67, 0.8)",
-                      "rgba(180, 42, 42, 0.8)",
-                    ],
+                    data: results.map((item) => item.frequency),
+                    backgroundColor: results.map((item) => item.color),
+                    borderColor: results.map((item) => item.color),
                   },
                 ],
               }}
@@ -48,7 +39,7 @@ const Analyze = () => {
                   },
                   title: {
                     display: true,
-                    text: "Labeled Information",
+                    text: "Theme Breakdown",
                   },
                   cutout: "50%",
                 },
@@ -58,21 +49,13 @@ const Analyze = () => {
             />
             <Bar
               data={{
-                labels: sourceData.map((item) => item.label),
+                labels: results.map((item) => item.name),
                 datasets: [
                   {
                     label: "Count",
-                    data: sourceData.map((item) => item.value),
-                    backgroundColor: [
-                      "rgba(43, 63, 229, 0.8)",
-                      "rgba(150, 185, 67, 0.8)",
-                      "rgba(180, 42, 42, 0.8)",
-                    ],
-                    borderColor: [
-                      "rgba(43, 63, 229, 0.8)",
-                      "rgba(150, 185, 67, 0.8)",
-                      "rgba(180, 42, 42, 0.8)",
-                    ],
+                    data: results.map((item) => item.frequency),
+                    backgroundColor: results.map((item) => item.color),
+                    borderColor: results.map((item) => item.color),
                   },
                 ],
               }}

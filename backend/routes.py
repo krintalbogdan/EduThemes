@@ -331,7 +331,7 @@ def submit_final_dataset(session_id):
     ROUTE: Submit the final dataset and calculate theme frequencies
     """
     try:
-        # Validate session
+        # validate session
         cleanup_expired_sessions()
         session = get_session(session_id)
         if not session:
@@ -343,7 +343,7 @@ def submit_final_dataset(session_id):
 
         dataset = data["dataset"]
 
-        # Calculate theme frequencies
+        # calculate theme frequencies
         theme_counts = {}
         for entry in dataset:
             for theme in entry.get("themes", []):
@@ -353,7 +353,7 @@ def submit_final_dataset(session_id):
                     theme_counts[theme_name] = {"name": theme_name, "color": theme_color, "frequency": 0}
                 theme_counts[theme_name]["frequency"] += 1
 
-        # Save the final dataset and theme frequencies to the session
+        # save the final dataset and theme frequencies to the session
         final_dataset_path = os.path.join(UPLOAD_FOLDER, f"{session_id}_final_dataset.json")
         with open(final_dataset_path, 'w') as f:
             json.dump(dataset, f)

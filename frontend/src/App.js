@@ -18,6 +18,7 @@ function App() {
   const [currentStage, setCurrentStage] = useState('start'); // stages: start screen, upload dataset, preview dataset, review, results
   const [claudeData, setClaudeData] = useState(null);
   const [svmData, setSvmData] = useState(null);
+  const [results, setResults] = useState(null);
 
   const handleSessionStart = (newSessionId) => {
     setSessionId(newSessionId);
@@ -32,10 +33,6 @@ function App() {
       <Header />
       <Container>
         {currentStage === "start" && (
-          // <Start
-          //   onSessionStart={handleSessionStart}
-          //   onAdvanceStage={() => handleAdvanceStage('upload')}
-          // />
           <Start
             onSessionStart={handleSessionStart}
             onAdvanceStage={() => handleAdvanceStage('upload')}
@@ -78,7 +75,16 @@ function App() {
               dataset={dataset}
               setDataset={setDataset}
               svmData={svmData}
+              setResults={setResults}
               onAdvanceStage={() => handleAdvanceStage('results')} 
+            />
+          </div>
+        )}
+
+        {currentStage === "results" && sessionId && (
+          <div>
+            <Analyze
+            results={results}
             />
           </div>
         )}

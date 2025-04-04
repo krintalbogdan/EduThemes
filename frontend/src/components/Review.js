@@ -3,7 +3,7 @@ import { Container, Button, Card, Row, Col, Modal, Badge } from 'react-bootstrap
 import { FaCheck, FaTimes, FaUndo } from 'react-icons/fa';
 import axios from 'axios';
 
-const Review = ({ sessionId, labels, dataset, setDataset, visualization, claudeData, svmData, onAdvanceStage }) => {
+const Review = ({ sessionId, labels, setResults, dataset, setDataset, visualization, claudeData, svmData, onAdvanceStage }) => {
     const [groupActions, setGroupActions] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [rejectedEntries, setRejectedEntries] = useState([]);
@@ -84,6 +84,7 @@ const Review = ({ sessionId, labels, dataset, setDataset, visualization, claudeD
                 const response = await axios.post(`http://localhost:1500/session/${sessionId}/submit-final-dataset`, { dataset });
                 if (response.status === 200) {
                     console.log(response.data);
+                    setResults(response.data.themes);
                     onAdvanceStage('results');
                 } else {
                     console.error('Error submitting final dataset:', response.data.error);
