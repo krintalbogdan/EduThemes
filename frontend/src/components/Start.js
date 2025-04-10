@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Container, Offcanvas } from 'react-bootstrap';
-import { Chart as ChartJS, Title} from 'chart.js/auto';
-import { Bar, Doughnut, Radar } from 'react-chartjs-2';
+import { Button, Container } from 'react-bootstrap';
 import axios from 'axios';
 import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa'; //from react icons, for the features icons
 
@@ -103,7 +101,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
                             fontSize: '16px',
                         }}
                     >
-                        Start New Session
+                        Start Analysis
                     </Button>
                 </div>
                 <hr/>
@@ -145,7 +143,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
                     lineHeight: '1.8',
                     fontSize: '16px'
                 }}>
-                    <li><strong>Start a New Session:</strong> Click the "Start New Session" button to begin.</li>
+                    <li><strong>Start an Analysis:</strong> Click the "Start Analysis" button to begin.</li>
                     <li><strong>Upload Your Dataset:</strong> Upload your file of text responses.</li>
                     <li><strong>Edit Labels:</strong> Review or modify the preprocessed data (optional).</li>
                     <li><strong>Run the Analysis:</strong> AI will group similar responses into themes.</li>

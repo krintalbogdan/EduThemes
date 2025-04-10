@@ -82,6 +82,9 @@ def init_db():
                 labels TEXT,
                 manual_coding TEXT,
                 analysis_results TEXT,
+                research_question TEXT,
+                project_description TEXT,
+                additional_context TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 expires_at DATETIME
@@ -182,6 +185,10 @@ def upload_dataset(session_id):
 
         file = request.files['dataset']
         
+        research_question = request.form.get('researchQuestion', '')
+        project_description = request.form.get('projectDescription', '')
+        additional_context = request.form.get('additionalContext', '')
+        
         # save file
         filename = secure_filename(f"{session_id}_{os.path.splitext(file.filename)[0]}")
         filepath = os.path.join(UPLOAD_FOLDER, f"{filename}{os.path.splitext(file.filename)[1]}")
@@ -213,10 +220,13 @@ def upload_dataset(session_id):
         with open(visualization_path, "rb") as image_file:
             visualization_base64 = base64.b64encode(image_file.read()).decode('utf-8')
 
-        # update session entry with dataset info
+        # update session entry with dataset info and context
         update_session(session_id, 
             dataset_path=filepath, 
             dataset_filename=filename,
+            research_question=research_question,
+            project_description=project_description,
+            additional_context=additional_context,
             status='DATASET_UPLOADED'
         )
 
