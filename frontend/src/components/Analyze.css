@@ -1,0 +1,28 @@
+.pill {
+  height: 30px;
+  font-size: 12px;
+  font-family: "Readex Pro", sans-serif;
+  padding: 0.5em 1em;
+  margin: 0.25em;
+  border-radius: 1em;
+  border: none;
+  outline: none;
+  background: #dddddd;
+}
+
+.pill:not(.pill--selected):hover {
+  background: #cccccc;
+}
+
+.pill--selected {
+  background: #009578;
+  color: #ffffff;
+}
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}

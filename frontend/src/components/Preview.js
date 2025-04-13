@@ -1,11 +1,38 @@
-import React, { useState } from 'react';
-import { Container, Button, Card, Row, Col, Form, Table, Badge } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { 
+  Container, Spinner, Button, Card, Row, Col, Form, 
+  Table, Badge, Modal, ListGroup, Alert, OverlayTrigger, Tooltip 
+} from 'react-bootstrap';
 import LabelModal from './LabelModal';
+import axios from 'axios';
 
-const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
+const Preview = ({ 
+  sessionId, 
+  dataset, 
+  setDataset, 
+  labels, 
+  setLabels, 
+  claudeData, 
+  svmData, 
+  setClaudeData, 
+  setSvmData, 
+  onAdvanceStage, 
+  projectMetadata 
+}) => {
     const [selectedEntry, setSelectedEntry] = useState(null);
     const [selectedIndex, setSelectedIndex] = useState(null);
-    const [labels, setLabels] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [suggestedThemes, setSuggestedThemes] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+      if (dataset && dataset.length > 0 && selectedEntry === null) {
+        setSelectedEntry(dataset[0]);
+        setSelectedIndex(0);
+      }
+    }, [dataset, selectedEntry]);
 
     const handleSelectEntry = (entry, index) => {
         if (index === selectedIndex) {
@@ -33,9 +60,7 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
 
     const saveThemes = () => {
         if (selectedEntry) {
-            console.log("setting dataset");
-            // update dataset with new themes
-            const updatedEntry = { ...selectedEntry, themes: selectedEntry.themes };
+            const updatedEntry = { ...selectedEntry, themes: selectedEntry.themes || [] };
             const updatedDataset = [...dataset];
             updatedDataset[selectedIndex] = updatedEntry;
             setDataset(updatedDataset);
@@ -45,67 +70,237 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
     const removeTheme = (themeName) => {
         setSelectedEntry((prev) => ({
             ...prev,
-            themes: prev.themes.filter((theme) => theme.name !== themeName),
+            themes: prev.themes?.filter((theme) => theme.name !== themeName) || [],
         }));
+        
+        setTimeout(() => saveThemes(), 0);
     };
+
+    const handleGetSuggestedThemes = async () => {
+        setLoadingSuggestions(true);
+        setError(null);
+        
+        try {
+            if (showSuggestions) {
+                setSuggestedThemes([]);
+            }
+            
+            const response = await axios.post(`http://localhost:1500/session/${sessionId}/suggest-themes`, {
+                labels: labels,
+                apiKey: projectMetadata.apiKey
+            });
+
+            if (response.data && response.data.suggested_themes) {
+                setSuggestedThemes(response.data.suggested_themes);
+                if (!showSuggestions) {
+                    setShowSuggestions(true);
+                }
+            } else {
+                setError("No themes could be generated. Please check data or try again.");
+            }
+        } catch (error) {
+            console.error("Error getting suggested themes:", error.response?.data || error.message);
+            setError("Failed to get suggested themes: " + (error.response?.data?.error || error.message));
+        } finally {
+            setLoadingSuggestions(false);
+        }
+    };
+
+    const handleAddSuggestedTheme = (theme) => {
+        const themeExists = labels.some(label => label.name === theme.name);
+        if (!themeExists) {
+            const color = '#' + Math.floor(Math.random()*16777215).toString(16);
+            
+            const newTheme = {
+                name: theme.name,
+                description: theme.description,
+                color: color
+            };
+            
+            setLabels([...labels, newTheme]);
+        }
+    };
+
+    const handleReview = async () => {
+        setIsLoading(true);
+        try {
+            const manualCodings = dataset
+                .map((entry, index) => ({
+                    index,
+                    themes: entry.themes || [],
+                }))
+                .filter((entry) => entry.themes.length > 0);
+
+            console.log(`Submitting ${manualCodings.length} manually coded responses`);
+
+            const response = await axios.post(`http://localhost:1500/session/${sessionId}/submit-manual-coding`, {
+                labels,
+                manual_codings: manualCodings,
+                apiKey: projectMetadata.apiKey
+            });
+
+            console.log(response.data);
+            setClaudeData(response.data.claude_data);
+            setSvmData(response.data.svm_data);
+            onAdvanceStage();
+        } catch (error) {
+            console.error("Error submitting manual coding:", error.response?.data || error.message);
+            setError("Failed to submit manual coding. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const codedCount = dataset?.filter((entry) => entry.themes?.length > 0).length || 0;
+    const totalResponses = dataset?.length || 0;
+    const percentageCoded = totalResponses > 0 ? ((codedCount / totalResponses) * 100).toFixed(1) : 0;
 
     return (
         <Container fluid className="d-flex justify-content-center align-items-start p-0" style={{ padding: '0', height: '90vh' }}>
             <Row className="h-100 m-0 w-100 gap-3">
-                <Col xs={3} className="p-2 bg-light border-end h-100">
-                    <Card className="mb-2" style={{ height: '25%' }}>
-                        <Card.Body className="border rounded d-flex flex-column">
+                <Col xs={3} className="p-2 bg-light h-100">
+                    <Card className="mb-2" style={{ height: "20%" }}>
+                        <Card.Body className="rounded d-flex flex-column">
                             <h5>Manual Coding</h5><hr/>
                             <p className="text-muted">
-                                This page allows you to create themes and (optionally) create a manually coded sample to provide to the LLM.
+                                This page allows you to create themes and manually code a sample to train the AI assistant.
                             </p>
+                            {error && <Alert variant="danger">{error}</Alert>}
                         </Card.Body>
                     </Card>
-                    <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '74%' }}>
-                        <Card.Body className="border rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
+
+                    <Card className="mb-2" style={{ height: "auto" }}>
+                        <Card.Body className="rounded d-flex flex-column">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Selected Themes ({labels.length})</strong>
+                                <div>
+                                    <Button 
+                                        variant="outline-primary" 
+                                        size="sm" 
+                                        onClick={() => setShowSuggestions(true)}
+                                        disabled={loadingSuggestions}
+                                        className="me-2"
+                                    >
+                                        View Suggestions
+                                    </Button>
+                                    <Button 
+                                        variant="outline-secondary" 
+                                        size="sm" 
+                                        onClick={handleGetSuggestedThemes}
+                                        disabled={loadingSuggestions || !sessionId || dataset?.length === 0}
+                                    >
+                                        {loadingSuggestions ? (
+                                            <>
+                                                <Spinner 
+                                                    as="span" 
+                                                    animation="border" 
+                                                    size="sm" 
+                                                    role="status" 
+                                                    aria-hidden="true" 
+                                                /> 
+                                                <span className="visually-hidden">Loading...</span>
+                                            </>
+                                        ) : (
+                                            "↻"
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                            <hr />
+                            {labels.length > 0 ? (
+                                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                    {labels.map((label, index) => (
+                                        <div key={index} className="d-flex align-items-center mb-2">
+                                            <div 
+                                                style={{ 
+                                                    width: '15px', 
+                                                    height: '15px', 
+                                                    borderRadius: '50%', 
+                                                    backgroundColor: label.color,
+                                                    marginRight: '10px'
+                                                }}
+                                            ></div>
+                                            <div>
+                                                <div><strong>{label.name}</strong></div>
+                                                {label.description && (
+                                                    <small className="text-muted">{label.description.length > 50 ? 
+                                                        label.description.substring(0, 50) + '...' : 
+                                                        label.description}
+                                                    </small>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-muted">No themes defined yet. Create themes using the "Edit Themes" button or get AI suggestions.</p>
+                            )}
+                        </Card.Body>
+                    </Card>
+
+                    <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '40%' }}>
+                        <Card.Body className="rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
                             {selectedEntry ? (
                                 <>
-                                    <h5>Selected Entry</h5>
+                                    <strong>Selected Response</strong>
                                     <hr />
                                     <p><strong>Original:</strong> {selectedEntry.original}</p>
                                     <p><strong>Cleaned:</strong> {selectedEntry.cleaned}</p>
                                     <hr />
                                     <Form.Group controlId="formThemes">
+                                        <strong>Assigned Themes</strong>
                                         {selectedEntry.themes?.length === 0 || selectedEntry.themes === undefined ? (
-                                            <Form.Label className="text-muted">No themes assigned yet.</Form.Label>
-                                        ) : null}
-                                        <div className="mb-2">
-                                            {selectedEntry.themes?.map((theme, index) => (
-                                                <Badge
-                                                    key={index}
-                                                    bg={null}
-                                                    style={{
-                                                        backgroundColor: theme.color,
-                                                        marginRight: '5px',
-                                                        cursor: 'pointer',
-                                                    }}
-                                                    onClick={() => removeTheme(theme.name)}
-                                                >
-                                                    {theme.name} ×
-                                                </Badge>
-                                            ))}
-                                        </div>
+                                            <p className="text-muted mt-2">No themes assigned yet.</p>
+                                        ) : (
+                                            <div className="mb-2 mt-2">
+                                                {selectedEntry.themes?.map((theme, index) => (
+                                                    <OverlayTrigger
+                                                        key={index}
+                                                        placement="top"
+                                                        overlay={
+                                                            <Tooltip id={`tooltip-${index}`}>
+                                                                {theme.description || "No description available"}
+                                                            </Tooltip>
+                                                        }
+                                                    >
+                                                        <Badge
+                                                            bg={null}
+                                                            style={{
+                                                                backgroundColor: theme.color,
+                                                                marginRight: '5px',
+                                                                marginBottom: '5px',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                            onClick={() => removeTheme(theme.name)}
+                                                        >
+                                                            {theme.name} ×
+                                                        </Badge>
+                                                    </OverlayTrigger>
+                                                ))}
+                                            </div>
+                                        )}
                                         <Form.Control
                                             type="text"
-                                            placeholder="Start typing..."
+                                            placeholder="Select a theme..."
                                             list="theme-options"
                                             onChange={handleThemeChange}
+                                            className="mt-2"
                                         />
                                         <datalist id="theme-options">
                                             {labels.map((label, index) => (
                                                 <option key={index} value={label.name} />
                                             ))}
                                         </datalist>
+                                        <div className="d-flex mt-2">
+                                            <small className="text-muted flex-grow-1">
+                                                Select from existing themes or add new ones using the "Edit Themes" button.
+                                            </small>
+                                        </div>
                                     </Form.Group>
                                 </>
                             ) : (
                                 <p className="text-muted">
-                                    Select an entry to view details here.
+                                    Select a response to view details and assign themes.
                                 </p>
                             )}
                         </Card.Body>
@@ -119,17 +314,36 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                                 <LabelModal labels={labels || []} setLabels={setLabels} />
                             </div>
                             <div className="d-flex align-items-center">
-                                <Button variant="outline-dark" disabled>
-                                    Coded: {dataset.filter((entry) => entry.themes?.length > 0).length}
-                                </Button>
-                                <Button variant="outline-dark" disabled style={{ margin: '10px' }}>
-                                    Responses: {dataset.length}
-                                </Button>
-                                <Button 
-                                    onClick={onAdvanceStage} 
-                                    disabled={labels.length === 0}
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={<Tooltip>Number of responses with assigned themes</Tooltip>}
                                 >
-                                    Review
+                                    <Button variant="outline-dark" disabled style={{ marginRight: '10px' }}>
+                                        Coded: {codedCount}/{totalResponses} ({percentageCoded}%)
+                                    </Button>
+                                </OverlayTrigger>
+                                <Button 
+                                    onClick={handleReview} 
+                                    disabled={
+                                        labels.length === 0 || 
+                                        !sessionId || 
+                                        isLoading
+                                    }
+                                >
+                                    {isLoading ? (
+                                        <>
+                                            <Spinner 
+                                                as="span" 
+                                                animation="border" 
+                                                size="sm" 
+                                                role="status" 
+                                                aria-hidden="true" 
+                                            /> 
+                                            &nbsp;&nbsp;Processing...
+                                        </>
+                                    ) : (
+                                        'Review'
+                                    )}
                                 </Button>
                             </div>
                         </Card.Header>
@@ -149,6 +363,7 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                                                     #
                                                 </th>
                                                 <th className="text-center align-middle">Response</th>
+                                                <th className="text-center align-middle" style={{ width: '15%' }}>Themes</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -156,7 +371,10 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                                                 <tr 
                                                     key={index} 
                                                     onClick={() => handleSelectEntry(entry, index)}                                                     
-                                                    style={{ cursor: 'pointer'}}
+                                                    style={{ 
+                                                        cursor: 'pointer',
+                                                        backgroundColor: index === selectedIndex ? '#e8f4f8' : 'inherit'
+                                                    }}
                                                 >
                                                     <td 
                                                         className="text-center align-middle" 
@@ -165,20 +383,31 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                                                         {index + 1}
                                                     </td>
                                                     <td 
-                                                        className="align-middle text-truncate" 
-                                                        style={{ maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                                        className="align-middle"
                                                     >
-                                                        <span 
-                                                            style={{
-                                                                display: 'inline-block',
-                                                                width: '10px',
-                                                                height: '10px',
-                                                                borderRadius: '50%',
-                                                                backgroundColor: entry.themes?.length > 0 ? '#28a745' : '#6c757d',
-                                                                marginRight: '10px',
-                                                            }}
-                                                        ></span>
-                                                        {entry.original}
+                                                        {entry.original.length > 100 ? 
+                                                            `${entry.original.substring(0, 100)}...` : 
+                                                            entry.original
+                                                        }
+                                                    </td>
+                                                    <td className="align-middle">
+                                                        <div className="d-flex flex-wrap gap-1">
+                                                            {entry.themes && entry.themes.length > 0 ? 
+                                                                entry.themes.map((theme, tidx) => (
+                                                                    <Badge
+                                                                        key={tidx}
+                                                                        bg={null}
+                                                                        style={{
+                                                                            backgroundColor: theme.color,
+                                                                            fontSize: '0.7rem'
+                                                                        }}
+                                                                    >
+                                                                        {theme.name}
+                                                                    </Badge>
+                                                                )) : 
+                                                                <span className="text-muted small">None</span>
+                                                            }
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -194,6 +423,87 @@ const Preview = ({ sessionId, dataset, setDataset, onAdvanceStage }) => {
                     </Card>
                 </Col>
             </Row>
+
+            <Modal 
+                show={showSuggestions} 
+                onHide={() => setShowSuggestions(false)}
+                centered
+                size="lg"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Theme Suggestions</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="d-flex justify-content-between mb-3">
+                        <span>
+                            {suggestedThemes.length > 0 ? 
+                                `Found ${suggestedThemes.length} theme suggestions` : 
+                                "No theme suggestions available."}
+                        </span>
+                        <Button 
+                            variant="outline-primary" 
+                            size="sm" 
+                            onClick={handleGetSuggestedThemes}
+                            disabled={loadingSuggestions || !sessionId || dataset?.length === 0}
+                        >
+                            {loadingSuggestions ? (
+                                <>
+                                    <Spinner 
+                                        as="span" 
+                                        animation="border" 
+                                        size="sm" 
+                                        role="status" 
+                                        aria-hidden="true" 
+                                    /> 
+                                    &nbsp;&nbsp;Refreshing...
+                                </>
+                            ) : (
+                                'Refresh Suggestions'
+                            )}
+                        </Button>
+                    </div>
+                    
+                    {loadingSuggestions ? (
+                        <div className="text-center py-4">
+                            <Spinner animation="border" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                            <p className="mt-2">Analyzing your responses to generate theme suggestions...</p>
+                        </div>
+                    ) : suggestedThemes.length > 0 ? (
+                        <ListGroup>
+                            {suggestedThemes.map((theme, index) => {
+                                const alreadyAdded = labels.some(l => l.name === theme.name);
+                                return (
+                                    <ListGroup.Item 
+                                        key={index}
+                                        className={`d-flex justify-content-between align-items-center ${alreadyAdded ? 'bg-light' : ''}`}
+                                    >
+                                        <div>
+                                            <h5>{theme.name} {alreadyAdded && <Badge bg="secondary">Already Added</Badge>}</h5>
+                                            <p className="text-muted mb-0">{theme.description}</p>
+                                        </div>
+                                        <Button 
+                                            variant={alreadyAdded ? "outline-secondary" : "outline-primary"}
+                                            onClick={() => handleAddSuggestedTheme(theme)}
+                                            disabled={alreadyAdded}
+                                        >
+                                            {alreadyAdded ? 'Added' : 'Add Theme'}
+                                        </Button>
+                                    </ListGroup.Item>
+                                );
+                            })}
+                        </ListGroup>
+                    ) : (
+                        <p className="text-center text-muted">No theme suggestions available. Click "Refresh Suggestions" to generate new themes.</p>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowSuggestions(false)}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };
