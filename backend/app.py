@@ -7,8 +7,7 @@ from routes import routes_bp, init_db
 def create_app():
     app = Flask(__name__)
     CORS(app)
-    
-    # configure upload folder
+
     app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
