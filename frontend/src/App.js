@@ -7,7 +7,6 @@ import Preview from "./components/Preview";
 import Review from "./components/Review";
 import Analyze from "./components/Analyze";
 import Chatbot from "./components/Chatbot";
-
 import { Container } from "react-bootstrap";
 
 function App() {

@@ -17,7 +17,6 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
 
     const containerStyle = {
         // backgroundColor: '#e6d3b3',
-        minHeight: '90vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -26,7 +25,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
 
     const windowStyle = {
         border: '4px solid black',
-        width: '90vh',
+        width: '100vh',
         maxWidth: '900px',
         padding: '35px',
         borderRadius: '12px',
@@ -59,7 +58,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
         display: 'flex',
         justifyContent: 'space-around',
         flexWrap: 'wrap',
-        marginTop: '20px',
+        marginTop: '10px',
     };
 
     const featureItemStyle = {

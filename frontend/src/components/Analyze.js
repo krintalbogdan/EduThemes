@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Button, Container } from "react-bootstrap";
+import 'chart.js/auto';
 import { Bar, Doughnut } from "react-chartjs-2";
 import axios from "axios";
 import "./Analyze.css";
-import Chatbot from "./Chatbot";
+
 
 const Analyze = ({ results, onAdvanceStage, sessionId }) => {
   const handleDownloadJSON = async () => {
@@ -27,6 +28,18 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
     }
   };
 
+
+  function getContrastingTextColor(hcolor){
+    const color = hcolor.replace("#", "");
+
+    const r = parseInt(color.substring(0, 2), 16);
+    const g = parseInt(color.substring(2, 4), 16);
+    const b = parseInt(color.substring(4, 6), 16);
+    
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 128 ? "black" : "white";
+  }
+
   return (
     <div className="d-flex">
       <Container
@@ -41,58 +54,64 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
             className="flex-column bg-white rounded-5 d-flex justify-content-center align-items-center"
             style={{ width: "90%", height: "100%", gap: "30px" }}
           >
-            <Doughnut
-              data={{
-                labels: results.map((item) => item.name),
-                datasets: [
-                  {
-                    label: "Count",
-                    data: results.map((item) => item.frequency),
-                    backgroundColor: results.map((item) => item.color),
-                    borderColor: results.map((item) => item.color),
+            <div className="d-flex justify-content-center align-items-center" style={{ width: "100%", height: "45%" }}>
+              <Doughnut
+                data={{
+                  labels: results.map((item) => item.name),
+                  datasets: [
+                    {
+                      label: "Count",
+                      data: results.map((item) => item.frequency),
+                      backgroundColor: results.map((item) => item.color),
+                      borderColor: results.map((item) => item.color),
+                    },
+                  ],
+                }}
+                options={{
+                  plugins: {
+                    legend: {
+                      display: false,
+                      position: "bottom",
+                    },
+                    title: {
+                      display: true,
+                      text: "Theme Breakdown",
+                    },
+                    cutout: "50%",
                   },
-                ],
-              }}
-              options={{
-                plugins: {
-                  legend: {
-                    position: "bottom",
+                }}
+                width={50}
+                height={50}
+              />
+            </div>
+            <div className="d-flex justify-content-center align-items-center" style={{ width: "100%", height: "45%" }}>
+              <Bar
+                data={{
+                  labels: results.map((item) => item.name),
+                  datasets: [
+                    {
+                      label: "Count",
+                      data: results.map((item) => item.frequency),
+                      backgroundColor: results.map((item) => item.color),
+                      borderColor: results.map((item) => item.color),
+                    },
+                  ],
+                }}
+                options={{
+                  plugins: {
+                    legend: {
+                      display: false,
+                      position: "bottom",
+                    },
+                    title: {
+                      display: false,
+                      text: "Data - title",
+                    },
                   },
-                  title: {
-                    display: true,
-                    text: "Theme Breakdown",
-                  },
-                  cutout: "50%",
-                },
-              }}
-              width={100}
-              height={100}
-            />
-            <Bar
-              data={{
-                labels: results.map((item) => item.name),
-                datasets: [
-                  {
-                    label: "Count",
-                    data: results.map((item) => item.frequency),
-                    backgroundColor: results.map((item) => item.color),
-                    borderColor: results.map((item) => item.color),
-                  },
-                ],
-              }}
-              options={{
-                plugins: {
-                  legend: {
-                    display: false,
-                    position: "bottom",
-                  },
-                  title: {
-                    display: false,
-                    text: "Data - title",
-                  },
-                },
-              }}
-            />
+                }}
+              />
+            </div>
+
           </div>
         </div>
 
@@ -113,7 +132,11 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
               <button
                 key={index}
                 className="pill"
-                style={{ backgroundColor: item.color }}
+                style={{ 
+                  backgroundColor: item.color,
+                  color: getContrastingTextColor(item.color),
+                
+                }}
                 type="button"
               >
                 {item.name} - {item.frequency}
