@@ -290,49 +290,50 @@ def generate_summary(responses, themes, classifications, research_question="", p
     except Exception as e:
         print(f"Error generating summary: {str(e)}")
 
-def process_chat_query(query, responses, themes, classifications, research_question="", project_description="", api_key=None):
+def process_chat_query(query, research_question="", project_description="", api_key=None, current_stage=None):
     if api_key is None or api_key == '':
         api_key = os.environ.get("ANTHROPIC_API_KEY")
         if not api_key:
             print("No API key provided.")
-            return "I can help analyze your dataset and explain the themes I've identified. What would you like to know more about?"
+            return "It seems your API key has not been connected."
     
     client = Anthropic(api_key=api_key)
     
-    theme_stats = []
-    total_responses = len(responses)
-    
-    for theme in themes:
-        theme_name = theme['name']
-        if theme_name in classifications:
-            count = len(classifications[theme_name])
-            percentage = (count / total_responses) * 100 if total_responses > 0 else 0
-            theme_stats.append({
-                'name': theme_name,
-                'description': theme.get('description', ''),
-                'count': count,
-                'percentage': percentage
-            })
-    theme_stats_text = ""
-    for stat in theme_stats:
-        theme_stats_text += f"- {stat['name']} ({stat['count']} responses, {stat['percentage']:.1f}%): {stat['description']}\n"
+    stage_context = ""
+    if current_stage == "upload":
+        stage_context = """
+        The user is on the Upload page where they can:
+        - Upload a dataset file (CSV or Excel)
+        - Enter research question and project description
+        - Enter their API key
+        """
+    elif current_stage == "preview":
+        stage_context = """
+        The user is on the Preview/Manual Coding page where they can:
+        - Create themes manually or get AI-suggested themes
+        - Assign themes to responses
+        - Review and edit the dataset
+        """
+    elif current_stage == "review":
+        stage_context = """
+        The user is on the Review page where they can:
+        - Approve or reject AI-suggested classifications
+        - Navigate between different themes
+        - Submit the final dataset
+        """
     
     prompt = f"""
-    You are an AI assistant helping analyze qualitative data. Answer the following question based on the dataset information provided.
+    You are a simple helper bot for the EduThemes interface. The user is asking: "{query}"
     
-    Research Question: {research_question}
-    Project Description: {project_description}
+    Their research question: {research_question}
+    Their project description: {project_description}
+    {stage_context}
+
     
-    Dataset: {total_responses} total responses
-    
-    Themes identified:
-    {theme_stats_text}
-    
-    User's question: {query}
-    
-    Provide a helpful, informative response to the user's question, focusing on insights and patterns from the analysis.
+    Answer ONLY about how to use the interface. DO NOT analyze the data or discuss research methods, this is not your purpose.
+    Keep your answers extremely brief (2-3 sentences maximum).
+    Focus only on helping the user navigate the current page, understand the buttons, or explain what they should do next.
     """
-    
     
     try:
         response = client.messages.create(
@@ -344,3 +345,4 @@ def process_chat_query(query, responses, themes, classifications, research_quest
             
     except Exception as e:
         print(f"Error processing chat query: {str(e)}")
+        return "I'm sorry, I encountered an error while processing your question."
