@@ -1,35 +1,16 @@
 import React, { useRef } from "react";
 import { MdArrowUpward } from "react-icons/md";
 
-const ChatForm = ({ chatHistory, setChatHistory, generateBotResponse }) => {
+const ChatForm = ({ generateBotResponse, isLoading }) => {
   const inputRef = useRef();
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
     const userMessage = inputRef.current.value.trim();
-    if (!userMessage) return;
+    if (!userMessage || isLoading) return;
+    
     inputRef.current.value = "";
-
-    setChatHistory((history) => [
-      ...history,
-      { role: "user", text: userMessage },
-    ]);
-
-    //Thinking is placeholder for the bot response
-    setTimeout(
-      () => {
-        setChatHistory((history) => [
-          ...history,
-          { role: "model", text: "Thinking..." },
-        ]);
-        generateBotResponse([
-          ...chatHistory,
-          { role: "user", text: userMessage },
-        ]);
-      },
-
-      600
-    );
+    generateBotResponse(userMessage);
   };
 
   return (
@@ -37,11 +18,12 @@ const ChatForm = ({ chatHistory, setChatHistory, generateBotResponse }) => {
       <input
         ref={inputRef}
         type="text"
-        placeholder="message...."
+        placeholder="Ask about using this page..."
         className="message-input"
         required
+        disabled={isLoading}
       />
-      <button>
+      <button type="submit" disabled={isLoading}>
         <MdArrowUpward />
       </button>
     </form>
