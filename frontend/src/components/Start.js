@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Container } from 'react-bootstrap';
 import axios from 'axios';
-import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa'; //from react icons, for the features icons
+import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa';
+import { MdHeight } from 'react-icons/md';
 
 const Start = ({ onSessionStart, onAdvanceStage }) => {
 
@@ -16,20 +17,19 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
     };
 
     const containerStyle = {
-        // backgroundColor: '#e6d3b3',
+        height: '90vh',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         fontFamily: 'sans-serif',
     };
 
     const windowStyle = {
         border: '4px solid black',
         width: '100vh',
-        maxWidth: '900px',
+        height: '90vh',
         padding: '35px',
         borderRadius: '12px',
-        // backgroundColor: '#fdf5e6',
         boxShadow: '8px 8px 0 black',
     };
 
@@ -37,14 +37,13 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
         fontSize: '48px',
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: '30px',
+        marginBottom: '10px',
     };
 
     const sectionTitleStyle = {
         fontSize: '28px',
         fontWeight: '600',
-        marginTop: '30px',
-        marginBottom: '10px',
+        marginTop: '20px',
         textAlign: 'center',
     };
 
