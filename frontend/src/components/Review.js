@@ -119,9 +119,8 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
         const rejectedIndices = (responseActions[currentTheme.name] || [])
             .map((action, idx) => (action === 'deny' ? themeResponses[idx] : null))
             .filter(index => index !== null);
-        
+
         if (rejectedIndices.length > 0) {
-            addToUnclassified(rejectedIndices);
             setRejectedEntries(rejectedIndices);
             setShowReassignModal(true);
         } else if (currentThemeIndex < allThemes.length - 1) {
@@ -132,8 +131,33 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
     };
 
     const handleFinishReassignment = () => {
+        rejectedEntries.forEach((rejectedIndex) => {
+            const currentThemeResponses = claudeData[currentTheme.name];
+            if (currentThemeResponses) {
+                claudeData[currentTheme.name] = currentThemeResponses.filter(
+                    (responseIndex) => responseIndex !== rejectedIndex
+                );
+            }
+
+            const isInOtherThemes = Object.keys(claudeData).some((themeName) => {
+                if (themeName !== currentTheme.name) {
+                    return claudeData[themeName]?.includes(rejectedIndex);
+                }
+                return false;
+            });
+
+            if (!isInOtherThemes) {
+                if (!claudeData["Unclassified"]) {
+                    claudeData["Unclassified"] = [];
+                }
+                if (!claudeData["Unclassified"].includes(rejectedIndex)) {
+                    claudeData["Unclassified"].push(rejectedIndex);
+                }
+            }
+        });
+
         setShowReassignModal(false);
-        
+
         if (currentThemeIndex >= allThemes.length - 1) {
             handleSubmitFinalDataset();
         } else {
@@ -144,30 +168,29 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
     const handleSubmitFinalDataset = async () => {
         setIsLoading(true);
         setError(null);
-        
+
         try {
             const updatedDataset = [...dataset];
-        
+
             Object.keys(responseActions).forEach(themeName => {
-                
                 const themeActions = responseActions[themeName];
                 const themeResponseIndices = claudeData[themeName] || [];
-                
+
                 themeActions.forEach((action, idx) => {
-                    if (action === 'approve') {
+                    if (action === 'approve' || themeName === "Unclassified") {
                         const responseIndex = themeResponseIndices[idx];
                         if (responseIndex !== undefined && responseIndex < updatedDataset.length) {
                             const theme = allThemes.find(label => label.name === themeName);
-                            
+
                             if (theme) {
                                 if (!updatedDataset[responseIndex].themes) {
                                     updatedDataset[responseIndex].themes = [];
                                 }
-                                
+
                                 const themeExists = updatedDataset[responseIndex].themes.some(
                                     t => t.name === theme.name
                                 );
-                                
+
                                 if (!themeExists) {
                                     updatedDataset[responseIndex].themes.push({
                                         name: theme.name,
@@ -180,17 +203,17 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                     }
                 });
             });
-            
+
             setDataset(updatedDataset);
-            
+
             const response = await axios.post(
-                `http://localhost:1500/session/${sessionId}/submit-final-dataset`, 
-                {
+                `http://localhost:1500/session/${sessionId}/submit-final-dataset`,
+                { 
                     dataset: updatedDataset,
-                    apiKey: projectMetadata.apiKey,
-                 }
+                    apiKey: projectMetadata.apiKey
+                }
             );
-            
+
             if (response.status === 200) {
                 setResults(response.data.themes);
                 onAdvanceStage();
@@ -205,7 +228,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
     };
     
     const currentActions = responseActions[currentTheme.name] || Array(themeResponses.length).fill(null);
-    const allActionsCompleted = currentActions.every(action => action !== null);
+    const allActionsCompleted = currentTheme.name === "Unclassified" || currentActions.every(action => action !== null);
     
     const totalThemes = allThemes.length;
     const completedThemes = Object.keys(responseActions).filter(theme => {
@@ -304,7 +327,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                 <Button 
                                     variant="primary" 
                                     onClick={handleNextTheme} 
-                                    disabled={!allActionsCompleted || isLoading}
+                                    disabled={(!allActionsCompleted || isLoading)}
                                 >
                                     {isLoading ? (
                                         <>
@@ -324,10 +347,21 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                             </div>
                         </Card.Header>
                         <div className="px-3 py-2 border-bottom d-flex justify-content-end">
-                            <Button className="me-2" variant="success" size="sm" onClick={handleAcceptAll}>
+                            <Button 
+                                className="me-2" 
+                                variant="success" 
+                                size="sm" 
+                                onClick={handleAcceptAll} 
+                                disabled={currentTheme.name === "Unclassified"}
+                            >
                                 Accept All
                             </Button>
-                            <Button variant="danger" size="sm" onClick={handleRejectAll}>
+                            <Button 
+                                variant="danger" 
+                                size="sm" 
+                                onClick={handleRejectAll} 
+                                disabled={currentTheme.name === "Unclassified"}
+                            >
                                 Reject All
                             </Button>
                         </div>
@@ -364,7 +398,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                                             'space-between' : 'center' 
                                                     }}
                                                 >
-                                                    {currentActions[idx] === null && (
+                                                    {currentActions[idx] === null && currentTheme.name !== "Unclassified" && (
                                                         <>
                                                             <Button 
                                                                 variant="success" 
@@ -384,7 +418,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                                             </Button>
                                                         </>
                                                     )}
-                                                    {currentActions[idx] !== null && (
+                                                    {currentActions[idx] !== null && currentTheme.name !== "Unclassified" && (
                                                         <Button 
                                                             variant="secondary" 
                                                             className="d-flex align-items-center" 
@@ -420,7 +454,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                 <Modal.Body>
                     <p>
                         You've rejected {rejectedEntries.length} classifications for the theme "{currentTheme.name}".
-                        These rejected items have been added to the "Unclassified" category.
+                        Rejected items will move to the "Unclassified" category if they have no other assignments.
                     </p>
                     <p>
                         Continue to {currentThemeIndex >= allThemes.length - 1 ? 'finish the review' : 'the next theme'}?

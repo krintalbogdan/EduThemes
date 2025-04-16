@@ -106,7 +106,11 @@ function App() {
           </div>
         )}
       </Container>
-      <Chatbot sessionId={sessionId} />
+      <Chatbot 
+        sessionId={sessionId} 
+        currentStage={currentStage} 
+        projectMetadata={projectMetadata} 
+      />
     </div>
   );
 }

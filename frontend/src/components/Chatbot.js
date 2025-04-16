@@ -14,7 +14,7 @@ const Chatbot = ({ sessionId, currentStage, projectMetadata }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const shouldShowChatbot = currentStage && 
-    ["upload", "preview", "review"].includes(currentStage);
+    ["preview", "review"].includes(currentStage);
 
   useEffect(() => {
     if (shouldShowChatbot && chatHistory.length === 0) {
