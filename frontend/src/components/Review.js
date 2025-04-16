@@ -185,7 +185,10 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
             
             const response = await axios.post(
                 `http://localhost:1500/session/${sessionId}/submit-final-dataset`, 
-                { dataset: updatedDataset }
+                {
+                    dataset: updatedDataset,
+                    apiKey: projectMetadata.apiKey,
+                 }
             );
             
             if (response.status === 200) {

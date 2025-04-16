@@ -3,10 +3,11 @@ import { Button, Container } from 'react-bootstrap';
 import axios from 'axios';
 import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa';
 
-const Start = ({ onSessionStart, onAdvanceStage }) => {
+const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
 
     const startSession = async () => {
         try {
+            setLabels([]);
             const response = await axios.post('http://localhost:1500/session/start');
             onSessionStart(response.data.session_id);
             onAdvanceStage();

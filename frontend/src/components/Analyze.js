@@ -225,6 +225,7 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
           variant="primary" 
           size="lg"
           onClick={() => onAdvanceStage()}
+          style={{ marginBottom: '20px' }}
         >
           Start New Analysis
         </Button>

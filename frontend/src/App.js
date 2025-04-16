@@ -46,6 +46,7 @@ function App() {
           <Start
             onSessionStart={handleSessionStart}
             onAdvanceStage={() => handleAdvanceStage('upload')}
+            setLabels={setLabels}
           />
         )}
 

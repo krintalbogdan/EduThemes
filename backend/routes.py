@@ -10,7 +10,7 @@ import pandas as pd
 import json
 import base64
 import random
-from src.llm.theme_analysis import suggest_themes, classify_responses_by_themes, generate_summary, process_chat_query
+from llm.theme_analysis import suggest_themes, classify_responses_by_themes, generate_summary, process_chat_query
 
 routes_bp = Blueprint('routes', __name__)
 
@@ -403,7 +403,7 @@ def submit_final_dataset(session_id):
                     research_question=research_question,
                     project_description=project_description,
                     api_key=api_key
-                )
+                ) if api_key else ""
             else:
                 summary = "No dataset found to generate summary."
         except Exception as e:
