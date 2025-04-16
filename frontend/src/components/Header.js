@@ -4,9 +4,9 @@ import Container from 'react-bootstrap/Container';
 
 const Header = () => {
     return (
-        <Navbar bg="primary" variant="dark" expand="lg" className="mb-4" style={{ height: '5vh'}}>
+        <Navbar bg="primary" variant="dark" expand="lg" className="mb-4"  style={{ height: '5vh'}}>
             <Container>
-                <Navbar.Brand><b>EduThemes</b></Navbar.Brand>
+                <Navbar.Brand style={{ marginLeft: '-200px' }}><b>EduThemes</b></Navbar.Brand>
             </Container>
         </Navbar>
     );

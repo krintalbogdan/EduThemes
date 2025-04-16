@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Container } from 'react-bootstrap';
 import axios from 'axios';
 import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa';
+import { MdHeight } from 'react-icons/md';
 
 const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
 
@@ -17,17 +18,17 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
     };
 
     const containerStyle = {
-        minHeight: '90vh',
+        height: '90vh',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         fontFamily: 'sans-serif',
     };
 
     const windowStyle = {
         border: '4px solid black',
-        width: '90vh',
-        maxWidth: '900px',
+        width: '100vh',
+        height: '90vh',
         padding: '35px',
         borderRadius: '12px',
         boxShadow: '8px 8px 0 black',
@@ -37,14 +38,13 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
         fontSize: '48px',
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: '30px',
+        marginBottom: '10px',
     };
 
     const sectionTitleStyle = {
         fontSize: '28px',
         fontWeight: '600',
-        marginTop: '30px',
-        marginBottom: '10px',
+        marginTop: '20px',
         textAlign: 'center',
     };
 
@@ -58,7 +58,7 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
         display: 'flex',
         justifyContent: 'space-around',
         flexWrap: 'wrap',
-        marginTop: '20px',
+        marginTop: '10px',
     };
 
     const featureItemStyle = {

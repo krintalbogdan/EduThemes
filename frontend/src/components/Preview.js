@@ -169,21 +169,12 @@ const Preview = ({
                         </Card.Body>
                     </Card>
 
-                    <Card className="mb-2" style={{ height: "auto" }}>
+                    <Card className="mb-2">
                         <Card.Body className="rounded d-flex flex-column">
                             <div className="d-flex justify-content-between align-items-center mb-2">
-                                <strong>Selected Themes ({labels.length})</strong>
+                                <strong>Created Themes - ({labels.length})</strong>
                                 <div>
-                                    <Button 
-                                        variant="outline-primary" 
-                                        size="sm" 
-                                        onClick={() => setShowSuggestions(true)}
-                                        disabled={loadingSuggestions}
-                                        className="me-2"
-                                    >
-                                        View Suggestions
-                                    </Button>
-                                    <Button 
+                                    {/* <Button 
                                         variant="outline-secondary" 
                                         size="sm" 
                                         onClick={handleGetSuggestedThemes}
@@ -203,12 +194,13 @@ const Preview = ({
                                         ) : (
                                             "↻"
                                         )}
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </div>
                             <hr />
+                            <div style={{ height: '150px', overflowY: 'auto' }}>
                             {labels.length > 0 ? (
-                                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                <div >
                                     {labels.map((label, index) => (
                                         <div key={index} className="d-flex align-items-center mb-2">
                                             <div 
@@ -221,32 +213,36 @@ const Preview = ({
                                                 }}
                                             ></div>
                                             <div>
-                                                <div><strong>{label.name}</strong></div>
-                                                {label.description && (
+                                                <div><strong>{label.name.length > 24 ? 
+                                                        label.name.substring(0, 24) + '...' : 
+                                                        label.name}</strong></div>
+                                                {/* {label.description && (
                                                     <small className="text-muted">{label.description.length > 50 ? 
                                                         label.description.substring(0, 50) + '...' : 
                                                         label.description}
                                                     </small>
-                                                )}
+                                                )} */}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-muted">No themes defined yet. Create themes using the "Edit Themes" button or get AI suggestions.</p>
+                                <p className="text-muted">No themes defined yet. Create themes using the "Edit Themes" button or get AI suggestions with the "Suggest Themes" button.</p>
                             )}
+                            </div>
                         </Card.Body>
                     </Card>
 
-                    <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '40%' }}>
-                        <Card.Body className="rounded d-flex flex-column" style={{ overflowY: 'auto'}}>
+                    <Card className="flex-grow-1" style={{ height: '47%' }}>
+                        <Card.Body className="rounded d-flex flex-column" style={{ maxHeight: '100%' }}>
                             {selectedEntry ? (
                                 <>
                                     <strong>Selected Response</strong>
                                     <hr />
+                                    <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
+
                                     <p><strong>Original:</strong> {selectedEntry.original}</p>
                                     <p><strong>Cleaned:</strong> {selectedEntry.cleaned}</p>
-                                    <hr />
                                     <Form.Group controlId="formThemes">
                                         <strong>Assigned Themes</strong>
                                         {selectedEntry.themes?.length === 0 || selectedEntry.themes === undefined ? (
@@ -297,6 +293,7 @@ const Preview = ({
                                             </small>
                                         </div>
                                     </Form.Group>
+                                    </div>
                                 </>
                             ) : (
                                 <p className="text-muted">
@@ -312,8 +309,18 @@ const Preview = ({
                         <Card.Header className="d-flex justify-content-between align-items-center">
                             <div className="d-flex align-items-center">
                                 <LabelModal labels={labels || []} setLabels={setLabels} />
+                                <Button 
+                                    variant="outline-primary" 
+                                    size="m" 
+                                    onClick={() => setShowSuggestions(true)}
+                                    disabled={loadingSuggestions}
+                                    className="me-2 ms-4"
+                                >
+                                    Suggested Themes
+                                </Button>
                             </div>
                             <div className="d-flex align-items-center">
+                                
                                 <OverlayTrigger
                                     placement="top"
                                     overlay={<Tooltip>Number of responses with assigned themes</Tooltip>}
@@ -329,6 +336,7 @@ const Preview = ({
                                         !sessionId || 
                                         isLoading
                                     }
+                                    className='ms-3'
                                 >
                                     {isLoading ? (
                                         <>
@@ -480,13 +488,14 @@ const Preview = ({
                                         className={`d-flex justify-content-between align-items-center ${alreadyAdded ? 'bg-light' : ''}`}
                                     >
                                         <div>
-                                            <h5>{theme.name} {alreadyAdded && <Badge bg="secondary">Already Added</Badge>}</h5>
+                                            <h5>{theme.name} {alreadyAdded}</h5>
                                             <p className="text-muted mb-0">{theme.description}</p>
                                         </div>
                                         <Button 
                                             variant={alreadyAdded ? "outline-secondary" : "outline-primary"}
                                             onClick={() => handleAddSuggestedTheme(theme)}
                                             disabled={alreadyAdded}
+                                            style={{ minWidth: '110px' }}
                                         >
                                             {alreadyAdded ? 'Added' : 'Add Theme'}
                                         </Button>

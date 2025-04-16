@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Button, Container, Card, Row, Col, Tab, Tabs } from "react-bootstrap";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
+import { Button, Container, OverlayTrigger, Card, Row, Col, Tab, Tabs, Tooltip } from "react-bootstrap";
+import { Chart as ChartJS, ArcElement, Legend, Tooltip as ChartTooltip , CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Bar, Doughnut } from "react-chartjs-2";
 import axios from "axios";
 import "./Analyze.css";
 import ReactMarkdown from 'react-markdown';
 
 ChartJS.register(
+  ChartTooltip,
   ArcElement, 
-  Tooltip, 
   Legend,
   CategoryScale,
   LinearScale,
@@ -16,7 +16,7 @@ ChartJS.register(
   Title
 );
 
-const Analyze = ({ results, onAdvanceStage, sessionId }) => {
+const Analyze = ({labels, results, onAdvanceStage, sessionId }) => {
   const [summary, setSummary] = useState("");
   
   useEffect(() => {
@@ -70,6 +70,18 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
       URL.revokeObjectURL(url);
     }
   };
+
+
+  const labelMap = React.useMemo(() => {
+    const map = {};
+    if (labels && Array.isArray(labels)) {
+      labels.forEach(label => {
+        map[label.name] = label.definition || label.description || "No definition available.";
+      });
+    }
+    return map;
+  }, [labels]);
+
   const themeData = results || [];
   
   return (
@@ -108,7 +120,7 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
               <Card className="shadow-sm mb-4">
                 <Card.Header>Theme Distribution</Card.Header>
                 <Card.Body className="d-flex justify-content-center">
-                  <div style={{ width: '100%', maxWidth: '400px' }}>
+                  <div style={{ width: '100%', maxWidth: '400px', height: '400px'}} >
                     <Doughnut
                       data={{
                         labels: themeData.map((item) => item.name),
@@ -124,11 +136,13 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
                       options={{
                         plugins: {
                           legend: {
+                            display: false,
+
                             position: "bottom",
                           },
                           title: {
-                            display: true,
-                            text: "Theme Distribution",
+                            display: false,
+                            text: "Hover over to see which theme it is!",
                           },
                         },
                       }}
@@ -139,10 +153,12 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
             </Col>
             
             <Col md={6}>
-              <Card className="shadow-sm mb-4">
+              <Card className="shadow-sm mb-4" style={{ height: '475px' }}>
                 <Card.Header>Theme Frequency</Card.Header>
-                <Card.Body>
+                <Card.Body >
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                   <Bar
+
                     data={{
                       labels: themeData.map((item) => item.name),
                       datasets: [
@@ -151,26 +167,21 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
                           data: themeData.map((item) => item.frequency),
                           backgroundColor: themeData.map((item) => item.color),
                           borderColor: themeData.map((item) => item.color),
+                          borderRadius: 5,
                         },
                       ],
                     }}
                     options={{
-                      indexAxis: 'y',
+                      indexAxis: 'x',
                       plugins: {
                         legend: {
                           display: false,
                         },
                       },
-                      scales: {
-                        x: {
-                          title: {
-                            display: true,
-                            text: 'Number of Responses'
-                          }
-                        }
-                      }
+                      
                     }}
                   />
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
@@ -194,21 +205,34 @@ const Analyze = ({ results, onAdvanceStage, sessionId }) => {
                 {themeData && themeData.length > 0 ? (
                   <div className="d-flex flex-wrap justify-content-center gap-3">
                     {themeData.map((item, index) => (
-                      <div 
+                      <OverlayTrigger
                         key={index}
-                        className="theme-card p-3 rounded"
-                        style={{ 
-                          backgroundColor: item.color, 
-                          color: isDarkColor(item.color) ? 'white' : 'black',
-                          minWidth: '200px',
-                          textAlign: 'center'
-                        }}
+                        delay={{ hide: 450, show: 300 }}
+                        overlay={(props) => (
+                          <Tooltip {...props} >
+                            <div style={{ fontSize: '1.2em',  borderRadius: '5px' }}>
+                              Definition - {labelMap[item.name] || "No description available"}
+                            </div>
+                          </Tooltip>
+                        )}
+                        placement="bottom"
                       >
-                        <h5>{item.name}</h5>
-                        <p className="mb-0">
-                          <strong>{item.frequency}</strong> responses
-                        </p>
-                      </div>
+                        <div 
+                          key={index}
+                          className="theme-card p-3 rounded"
+                          style={{ 
+                            backgroundColor: item.color, 
+                            color: isDarkColor(item.color) ? 'white' : 'black',
+                            minWidth: '200px',
+                            textAlign: 'center',
+                          }}
+                        >
+                          <h5>{item.name}</h5>
+                          <p className="mb-0">
+                            <strong>{item.frequency}</strong> responses
+                          </p>
+                        </div>
+                      </OverlayTrigger>
                     ))}
                   </div>
                 ) : (

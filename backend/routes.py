@@ -10,7 +10,7 @@ import pandas as pd
 import json
 import base64
 import random
-from llm.theme_analysis import suggest_themes, classify_responses_by_themes, generate_summary, process_chat_query
+from src.llm.theme_analysis import suggest_themes, classify_responses_by_themes, generate_summary, process_chat_query
 
 routes_bp = Blueprint('routes', __name__)
 

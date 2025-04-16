@@ -99,6 +99,7 @@ function App() {
         {currentStage === "results" && sessionId && (
           <div>
             <Analyze
+              labels={labels}
               results={results}
               sessionId={sessionId}
               onAdvanceStage={() => handleAdvanceStage('start')}

@@ -157,26 +157,25 @@ const LabelModal = ({ labels = [], setLabels }) => {
                         </Form.Group>
                         
                         <div className="d-flex mb-3 align-items-center">
-                            <Form.Group className="me-3">
-                                <Form.Label>Theme Color</Form.Label>
-                                <Form.Control
-                                    type="color"
-                                    value={selectedColor}
-                                    onChange={(e) => setSelectedColor(e.target.value)}
-                                    className="form-control-color"
-                                />
-                            </Form.Group>
-                            
+                            <Form.Label>Theme Color - </Form.Label>
+                            <Form.Control
+                                type="color"
+                                value={selectedColor}
+                                onChange={(e) => setSelectedColor(e.target.value)}
+                                className="form-control-color m-2"
+                            />
+
                             {formMode === 'add' ? (
                                 <Button 
                                     variant="success" 
                                     onClick={addLabel}
                                     disabled={!newLabel.trim() || labels.length >= 10}
+                                    className="d-flex ms-auto"
                                 >
                                     Add Theme
                                 </Button>
                             ) : (
-                                <div className="d-flex">
+                                <div className="d-flex ms-auto">
                                     <Button 
                                         variant="primary" 
                                         onClick={updateLabel}
@@ -237,7 +236,7 @@ const LabelModal = ({ labels = [], setLabels }) => {
                                             )}
                                         </div>
                                     </div>
-                                    <div>
+                                    <div className='d-flex'>
                                         <Button 
                                             variant="outline-secondary" 
                                             size="sm" 

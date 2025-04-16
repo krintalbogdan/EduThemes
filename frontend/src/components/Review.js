@@ -243,7 +243,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
         <Container fluid className="d-flex justify-content-center align-items-start p-0" style={{ padding: '0', height: '90vh' }}>
             <Row className="h-100 m-0 w-100 gap-3">
                 <Col xs={3} className="p-2 bg-light h-100">
-                    <Card className="mb-2" style={{ height: '25%' }}>
+                    <Card className="mb-2" style={{ height: '20%' }}>
                         <Card.Body className="rounded d-flex flex-column">
                             <h5>Theme Review</h5><hr/>
                             <p className="text-muted">
@@ -252,7 +252,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                             {error && <Alert variant="danger">{error}</Alert>}
                         </Card.Body>
                     </Card>
-                    <Card className="mb-2" style={{ height: '20%' }}>
+                    <Card className="mb-2" style={{ height: '28%' }}>
                         <Card.Body className="rounded d-flex flex-column">
                             <strong>Current Theme</strong><hr/>
                             <div className="d-flex align-items-center mb-2">
@@ -267,25 +267,23 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                 ></div>
                                 <h5 className="mb-0">{currentTheme.name}</h5>
                             </div>
-                            <p>{currentTheme.description || "No description available"}</p>
+                            <div style={{ overflowY: 'auto', maxHeight: '110px' }}>
+                                <p>{currentTheme.description || "No description available"} </p>
+                            </div>
+                            
                         </Card.Body>
                     </Card>
-                    <Card className="flex-grow-1" style={{ overflowY: 'auto', height: '50%' }}>
+                    <Card className="flex-grow-1" style={{height: '50%' }}>
                         <Card.Body className="rounded d-flex flex-column">
                             <strong>Progress</strong><hr/>
-                            <ProgressBar 
-                                now={progressPercentage} 
-                                label={`${Math.round(progressPercentage)}%`}
-                                variant="info" 
-                                className="mb-3"
-                            />
+                            
                             <p className="text-muted">
                                 Reviewing theme {currentThemeIndex + 1} of {totalThemes}
                             </p>
                             <p>
-                                <strong>Themes List:</strong>
+                                <strong>Theme List:</strong>
                             </p>
-                            <div style={{ overflowY: 'auto' }}>
+                            <div style={{ overflowY: 'auto', maxHeight: '235px' }}>
                                 {allThemes.map((label, index) => {
                                     const isComplete = responseActions[label.name] && 
                                         responseActions[label.name].every(action => action !== null);
@@ -346,24 +344,23 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                 </Button>
                             </div>
                         </Card.Header>
-                        <div className="px-3 py-2 border-bottom d-flex justify-content-end">
-                            <Button 
-                                className="me-2" 
-                                variant="success" 
-                                size="sm" 
-                                onClick={handleAcceptAll} 
-                                disabled={currentTheme.name === "Unclassified"}
-                            >
-                                Accept All
-                            </Button>
-                            <Button 
-                                variant="danger" 
-                                size="sm" 
-                                onClick={handleRejectAll} 
-                                disabled={currentTheme.name === "Unclassified"}
-                            >
-                                Reject All
-                            </Button>
+                        
+                        <div className="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+                            <ProgressBar 
+                                now={progressPercentage} 
+                                label={`${Math.round(progressPercentage)}%`}
+                                variant="info" 
+                                className="mb-0" // Remove margin below if vertically aligned
+                                style={{ width: '60%' }} // Optional: limit width so buttons fit well
+                            />
+                            <div className="d-flex">
+                                <Button className="me-2" variant="success" size="sm" onClick={handleAcceptAll}>
+                                    Accept All
+                                </Button>
+                                <Button variant="danger" size="sm" onClick={handleRejectAll}>
+                                    Reject All
+                                </Button>
+                            </div>
                         </div>
                         <Card.Body style={{ height: '1px' }}>
                             <div 
