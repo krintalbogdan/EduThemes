@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Container } from 'react-bootstrap';
 import axios from 'axios';
-import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa'; //from react icons, for the features icons
+import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa';
 
 const Start = ({ onSessionStart, onAdvanceStage }) => {
 
@@ -16,7 +16,6 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
     };
 
     const containerStyle = {
-        // backgroundColor: '#e6d3b3',
         minHeight: '90vh',
         display: 'flex',
         justifyContent: 'center',
@@ -30,7 +29,6 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
         maxWidth: '900px',
         padding: '35px',
         borderRadius: '12px',
-        // backgroundColor: '#fdf5e6',
         boxShadow: '8px 8px 0 black',
     };
 

@@ -15,10 +15,16 @@ function App() {
   const [dataset, setDataset] = useState(null);
   const [visualization, setVisualization] = useState(null);
   const [labels, setLabels] = useState([]);
-  const [currentStage, setCurrentStage] = useState('start'); // stages: start screen, upload dataset, preview dataset, review, results
+  const [currentStage, setCurrentStage] = useState('start');
   const [claudeData, setClaudeData] = useState(null);
   const [svmData, setSvmData] = useState(null);
   const [results, setResults] = useState(null);
+  const [projectMetadata, setProjectMetadata] = useState({
+    researchQuestion: "",
+    projectDescription: "",
+    additionalContext: "",
+    apiKey: ""
+  });
 
   const handleSessionStart = (newSessionId) => {
     setSessionId(newSessionId);
@@ -26,6 +32,10 @@ function App() {
 
   const handleAdvanceStage = (stage) => {
     setCurrentStage(stage);
+  };
+
+  const handleSetProjectMetadata = (metadata) => {
+    setProjectMetadata(metadata);
   };
 
   return (
@@ -44,7 +54,8 @@ function App() {
             sessionId={sessionId}
             setDataset={setDataset} 
             setVisualization={setVisualization}
-            onAdvanceStage={() => handleAdvanceStage('preview')} 
+            onAdvanceStage={() => handleAdvanceStage('preview')}
+            setProjectMetadata={handleSetProjectMetadata}
           />
         )}
 
@@ -60,6 +71,7 @@ function App() {
               svmData={svmData}
               setSvmData={setSvmData}
               setDataset={setDataset}
+              projectMetadata={projectMetadata}
               onAdvanceStage={() => handleAdvanceStage("review")}
             />
           </div>
@@ -71,11 +83,13 @@ function App() {
               sessionId={sessionId}
               visualization={visualization}
               labels={labels}
+              setLabels={setLabels}  
               claudeData={claudeData}
+              setClaudeData={setClaudeData}
               dataset={dataset}
               setDataset={setDataset}
-              svmData={svmData}
               setResults={setResults}
+              projectMetadata={projectMetadata}
               onAdvanceStage={() => handleAdvanceStage('results')} 
             />
           </div>
@@ -84,14 +98,14 @@ function App() {
         {currentStage === "results" && sessionId && (
           <div>
             <Analyze
-            results={results}
-            sessionId={sessionId}
-            onAdvanceStage={() => handleAdvanceStage('start')}
+              results={results}
+              sessionId={sessionId}
+              onAdvanceStage={() => handleAdvanceStage('start')}
             />
           </div>
         )}
       </Container>
-      <Chatbot />
+      <Chatbot sessionId={sessionId} />
     </div>
   );
 }
