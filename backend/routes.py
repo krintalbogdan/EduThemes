@@ -524,27 +524,6 @@ def submit_manual_coding(session_id):
                 "svm_data": {}
             })
 
-        final_dataset_path = os.path.join(UPLOAD_FOLDER, f"{session_id}_final_dataset.json")
-        with open(final_dataset_path, 'w') as f:
-            json.dump(dataset, f)
-            
-        summary_path = os.path.join(UPLOAD_FOLDER, f"{session_id}_summary.txt")
-        with open(summary_path, 'w') as f:
-            f.write(summary)
-
-        update_session(session_id, 
-            analysis_results=json.dumps({
-                "themes": list(theme_counts.values()),
-                "summary": summary
-            }),
-            status='FINAL_DATASET_SUBMITTED'
-        )
-
-        return jsonify({
-            "message": "Final dataset submitted successfully.",
-            "themes": list(theme_counts.values()),
-            "summary": summary
-        })
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
@@ -580,7 +559,6 @@ def download_final_dataset(session_id):
         print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-
 @routes_bp.route('/session/<session_id>/analyze-text', methods=['POST'])
 def analyze_text(session_id):
     try:
@@ -594,77 +572,18 @@ def analyze_text(session_id):
             return jsonify({"error": "Invalid request body"}), 400
             
         user_message = data["message"]
-        api_key = data.get('apiKey', '') 
-        
-        dataset_path = session['dataset_path']
-        if not dataset_path or not os.path.exists(dataset_path):
-            return jsonify({"response": "Sorry, I don't have a dataset to analyze. Please upload a dataset first."}), 200
-            
-        file_ext = os.path.splitext(dataset_path)[1].lower()
-        if file_ext in ['.xlsx', '.xls']:
-            df = pd.read_excel(dataset_path)
-        elif file_ext == '.csv':
-            df = pd.read_csv(dataset_path)
-        else:
-            return jsonify({"response": "Sorry, I can't process this file format."}), 200
-            
-        responses_col = None
-        if 'Response' in df.columns:
-            responses_col = df['Response']
-        elif 'Responses' in df.columns:
-            responses_col = df['Responses']
-        else:
-            for col in df.columns:
-                if 'response' in col.lower() or 'answer' in col.lower() or 'text' in col.lower():
-                    responses_col = df[col]
-                    break
-            
-            if responses_col is None and len(df.columns) > 0:
-                responses_col = df.iloc[:, 0]
-        
-        if responses_col is not None:
-            responses = responses_col.dropna().astype(str).tolist()
-        else:
-            return jsonify({"response": "Sorry, I couldn't identify the responses in your dataset."}), 200
-        
-        labels_str = session['labels']
-        labels = json.loads(labels_str) if labels_str else []
-    
-        analysis_results_str = session['analysis_results']
-        if analysis_results_str:
-            analysis_results = json.loads(analysis_results_str)
-        else:
-            analysis_results = None
-            
+        api_key = data.get('apiKey', '')
+        current_stage = data.get('currentStage', '')
         research_question = session['research_question']
         project_description = session['project_description']
         
-        final_dataset_path = os.path.join(UPLOAD_FOLDER, f"{session_id}_final_dataset.json")
-        if os.path.exists(final_dataset_path):
-            with open(final_dataset_path, 'r') as f:
-                final_dataset = json.load(f)
-                
-            classifications = {}
-            for theme in labels:
-                theme_name = theme['name']
-                classifications[theme_name] = []
-                
-            for i, entry in enumerate(final_dataset):
-                for theme in entry.get("themes", []):
-                    theme_name = theme["name"]
-                    if theme_name in classifications:
-                        classifications[theme_name].append(i)
-        else:
-            classifications = {}
             
         response_text = process_chat_query(
             query=user_message,
-            responses=responses,
-            themes=labels,
-            classifications=classifications,
             research_question=research_question,
             project_description=project_description,
-            api_key=api_key
+            api_key=api_key,
+            current_stage=current_stage
         )
         
         return jsonify({
@@ -673,5 +592,5 @@ def analyze_text(session_id):
     except Exception as e:
         print(f"Error processing chat query: {str(e)}")
         return jsonify({
-            "response": f"I encountered an error while analyzing the data. Please try again or check if your dataset is properly uploaded."
+            "response": f"I'm sorry, I encountered an error while processing your question."
         }), 200
