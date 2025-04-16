@@ -213,9 +213,9 @@ const Preview = ({
                                                 }}
                                             ></div>
                                             <div>
-                                                <div><strong>{label.name.length > 24 ? 
+                                                <div>{label.name.length > 24 ? 
                                                         label.name.substring(0, 24) + '...' : 
-                                                        label.name}</strong></div>
+                                                        label.name}</div>
                                                 {/* {label.description && (
                                                     <small className="text-muted">{label.description.length > 50 ? 
                                                         label.description.substring(0, 50) + '...' : 

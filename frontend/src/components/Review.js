@@ -236,7 +236,11 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
         return actions && actions.every(action => action !== null);
     }).length;
     
-    const progressPercentage = totalThemes > 0 ? (completedThemes / totalThemes) * 100 : 0;
+    const progressPercentage = currentTheme.name === "Unclassified" 
+        ? 100 
+        : totalThemes > 0 
+            ? (completedThemes / totalThemes) * 100 
+            : 0;
     const formattedThemeName = `${currentTheme.name} (${themeResponses.length} responses)`;
 
     return (
@@ -354,10 +358,21 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                 style={{ width: '60%' }} // Optional: limit width so buttons fit well
                             />
                             <div className="d-flex">
-                                <Button className="me-2" variant="success" size="sm" onClick={handleAcceptAll}>
+                                <Button 
+                                    className="me-2" 
+                                    variant="success" 
+                                    size="sm" 
+                                    onClick={handleAcceptAll} 
+                                    disabled={currentTheme.name === "Unclassified"}
+                                >
                                     Accept All
                                 </Button>
-                                <Button variant="danger" size="sm" onClick={handleRejectAll}>
+                                <Button 
+                                    variant="danger" 
+                                    size="sm" 
+                                    onClick={handleRejectAll} 
+                                    disabled={currentTheme.name === "Unclassified"}
+                                >
                                     Reject All
                                 </Button>
                             </div>
