@@ -42,7 +42,7 @@
     transform: scale(0.2);
     bottom: 90px;
     right: 35px;
-    width: 310px;
+    width: 360px;
     overflow: hidden;
     background: #fff;
     border-radius: 15px;
@@ -128,7 +128,7 @@
 
 .chat-body .bot-message {
     align-self: flex-start;
-    max-width: 75%;
+    max-width: 100%;
 }
 
 .chat-body .bot-message .bot-logo{

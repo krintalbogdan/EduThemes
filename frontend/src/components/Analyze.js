@@ -242,9 +242,10 @@ const Analyze = ({labels, results, onAdvanceStage, sessionId }) => {
             </Card.Body>
           </Card>
         </Tab>
+        
       </Tabs>
       
-      <div className="d-flex justify-content-end mt-4">
+      <div className="d-flex justify-content-center mt-4">
         <Button 
           variant="primary" 
           size="lg"
