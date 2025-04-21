@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
-def plot_decision_boundary(model_path, projection_csv, title="Decision Boundary", save_fig=False, fig_path="decision_boundary.png"):
+def plot_decision_boundary(model_path, projection_csv, visualization, title="Decision Boundary", save_fig=True, fig_name="decision_boundary.png"):
     """
     Loads the trained SVC model and 2D projection data, then plots the decision boundary along with the data points
     """
@@ -43,8 +43,8 @@ def plot_decision_boundary(model_path, projection_csv, title="Decision Boundary"
     plt.colorbar(scatter, label="Cluster Label")
     
     if save_fig:
-        plt.savefig(fig_path, dpi=300)
-        logging.info(f"Saved decision boundary plot to {fig_path}")
+        plt.savefig(visualization, dpi=300)
+        logging.info(f"Saved decision boundary plot to {visualization}")
     plt.show()
 
 if __name__ == '__main__':

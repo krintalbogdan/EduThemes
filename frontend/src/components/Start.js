@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Button, Container } from 'react-bootstrap';
 import axios from 'axios';
-import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa'; //from react icons, for the features icons
+import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa';
+import { MdHeight } from 'react-icons/md';
 
-const Start = ({ onSessionStart, onAdvanceStage }) => {
+const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
 
     const startSession = async () => {
         try {
+            setLabels([]);
             const response = await axios.post('http://localhost:1500/session/start');
             onSessionStart(response.data.session_id);
             onAdvanceStage();
@@ -16,21 +18,19 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
     };
 
     const containerStyle = {
-        backgroundColor: '#e6d3b3',
-        minHeight: '100vh',
+        height: '90vh',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         fontFamily: 'sans-serif',
     };
 
     const windowStyle = {
         border: '4px solid black',
-        width: '90%',
-        maxWidth: '900px',
-        padding: '40px',
+        width: '100vh',
+        height: '90vh',
+        padding: '35px',
         borderRadius: '12px',
-        backgroundColor: '#fdf5e6',
         boxShadow: '8px 8px 0 black',
     };
 
@@ -38,14 +38,13 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
         fontSize: '48px',
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: '30px',
+        marginBottom: '10px',
     };
 
     const sectionTitleStyle = {
         fontSize: '28px',
         fontWeight: '600',
-        marginTop: '30px',
-        marginBottom: '10px',
+        marginTop: '20px',
         textAlign: 'center',
     };
 
@@ -59,7 +58,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
         display: 'flex',
         justifyContent: 'space-around',
         flexWrap: 'wrap',
-        marginTop: '20px',
+        marginTop: '10px',
     };
 
     const featureItemStyle = {
@@ -74,7 +73,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
 
     return (
         <div style={containerStyle}>
-            <div style={windowStyle}>
+            <div style={windowStyle} class="bg-light">
                 <div style={titleStyle}>EduThemes</div>
                 <div style={{
                     fontSize: '16px',
@@ -101,9 +100,10 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
                             fontSize: '16px',
                         }}
                     >
-                        Start New Session
+                        Start Analysis
                     </Button>
                 </div>
+                <hr/>
                 <div>
                     <div style={sectionTitleStyle}>Features</div>
                     <div style={featuresStyle}>
@@ -125,6 +125,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
                         </div>
                     </div>
                 </div>
+                <hr/>
                 <div style={{
                     fontSize: '24px',
                     fontWeight: '600',
@@ -141,7 +142,7 @@ const Start = ({ onSessionStart, onAdvanceStage }) => {
                     lineHeight: '1.8',
                     fontSize: '16px'
                 }}>
-                    <li><strong>Start a New Session:</strong> Click the "Start New Session" button to begin.</li>
+                    <li><strong>Start an Analysis:</strong> Click the "Start Analysis" button to begin.</li>
                     <li><strong>Upload Your Dataset:</strong> Upload your file of text responses.</li>
                     <li><strong>Edit Labels:</strong> Review or modify the preprocessed data (optional).</li>
                     <li><strong>Run the Analysis:</strong> AI will group similar responses into themes.</li>
