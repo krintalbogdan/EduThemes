@@ -98,8 +98,9 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
                     <Row className="mb-4">
                         <Col>
                             <Form.Group controlId="formResearchQuestion" className="mb-3">
+                               
                                 <Form.Label className="text-start fw-bold w-100">Research Question <span className="text-danger">*</span></Form.Label>
-                                <Form.Control 
+                                <input className="textarea textarea-info textarea-lg"
                                     type="text" 
                                     placeholder="What do you want to learn from this data?" 
                                     value={researchQuestion} 
@@ -109,6 +110,13 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
                                 <Form.Text className="text-muted">
                                     Example: "How do students perceive AI tools in education?"
                                 </Form.Text>
+                                
+                                {/*
+                                <fieldset className="fieldset">
+                                    <legend className="fieldset-legend">What is your name?</legend>
+                                    <input type="text" className="input" placeholder="Type here" />
+                                    <p className="label">Optional</p>
+                                </fieldset>*/}
                             </Form.Group>
 
                             <Form.Group controlId="formProjectDescription" className="mb-3">

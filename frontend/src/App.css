@@ -1,8 +1,13 @@
 @import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900);
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, cupcake;
+}
 
 .App {
   text-align: left;
-  background-color: #e8e8e8;
+  /*background-color: #FFFFFF;*/
   min-height: 100vh;
   font-family: 'Roboto';
 
@@ -20,14 +25,19 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  /*background-color: #FFFFFF;*/
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  /*color: white;*/
+}
+
+.container{
+
+  margin: 0px;
 }
 
 .App-link {
@@ -41,6 +51,10 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.card-title{
+  font-weight: bold;
 }
 
 .pill {

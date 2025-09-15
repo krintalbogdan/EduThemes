@@ -8,7 +8,7 @@ import Review from "./components/Review";
 import Analyze from "./components/Analyze";
 import Chatbot from "./components/Chatbot";
 
-import { Container } from "react-bootstrap";
+//import { Container } from "react-bootstrap";
 
 function App() {
   const [sessionId, setSessionId] = useState(null);
@@ -39,9 +39,10 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className="App" data-theme="dark">
       <Header />
-      <Container>
+      <div>
+        {/*</Container>*/}
         {currentStage === "start" && (
           <Start
             onSessionStart={handleSessionStart}
@@ -106,7 +107,8 @@ function App() {
             />
           </div>
         )}
-      </Container>
+      </div>
+      {/*</Container>*/}
       <Chatbot 
         sessionId={sessionId} 
         currentStage={currentStage} 
