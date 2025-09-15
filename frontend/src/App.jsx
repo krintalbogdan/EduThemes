@@ -11,6 +11,7 @@ import Chatbot from "./components/Chatbot";
 //import { Container } from "react-bootstrap";
 
 function App() {
+  const [theme, setTheme] = useState('light'); // 'light' or 'dark'
   const [sessionId, setSessionId] = useState(null);
   const [dataset, setDataset] = useState(null);
   const [visualization, setVisualization] = useState(null);
@@ -39,8 +40,8 @@ function App() {
   };
 
   return (
-    <div className="App" data-theme="dark">
-      <Header />
+    <div className="App" data-theme={theme}>
+      <Header themeFunc={setTheme}/>
       <div>
         {/*</Container>*/}
         {currentStage === "start" && (

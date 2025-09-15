@@ -75,9 +75,9 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
 
     return (
         
-        <div style={containerStyle}>
+        <div style={containerStyle} className="bg-base-200">
             
-            <div style={windowStyle} className=" bg-white">
+            <div style={windowStyle}>
                 {/*
                 <div style={titleStyle}>EduThemes</div>
 
@@ -96,51 +96,54 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
                     so you can understand your data faster and make informed decisions.
                 </div>*/}
 
-
-
-                <div className="hero bg-neutral-100 w-full">
-                <div className="hero-content text-center py-20">
+                <div className="hero bg-base-200 min-h-80">
+                <div className="hero-content text-center">
                     <div className="max-w-md">
                     <h1 className="text-5xl font-bold" style = {titleStyle}>EduThemes</h1>
-                    <p className="py-6 text-lg">Harness the power of AI, extract actionable data.</p>
+                    <p className="py-6 text-lg">
+                        Harness the power of AI, extract actionable data.
+                    </p>
                     <button className="btn btn-primary text-xl" onClick={startSession}>Start Analysis</button>
                     </div>
                 </div>
                 </div>
 
-                <section className="container mx-auto px-4 py-16">
-                <h2 className="text-4xl font-bold text-center m-10">Features</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 m-16 mt-13">
-                    <div className="card bg-base-100 shadow-xl border border-base-300">
-                        <div className="card-body items-center text-center">
-                            <div className="text-4xl text-primary">📄</div>
-                            <h3 className="card-title mt-2">Upload Data</h3>
-                            <p>Easily upload your text responses in a single CSV or Excel file.</p>
+                <div className="container bg-base-200 mx-auto px-4 py-16">
+                    <h2 className="text-4xl font-bold text-center m-10">Features</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 m-16 mt-13">
+                        <div className="card bg-base-100 shadow-xl border border-base-300">
+                            <div className="card-body items-center text-center">
+                                <div className="text-4xl text-primary">📄</div>
+                                <h3 className="card-title mt-2">Upload Data</h3>
+                                <p>Easily upload your text responses in a single CSV or Excel file.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div className="card bg-base-100 shadow-xl border border-base-300">
-                        <div className="card-body items-center text-center">
-                            <div className="text-4xl text-primary">🔄</div>
-                            <h3 className="card-title mt-2">Preprocess Data</h3>
-                            <p>AI will clean and prepare your data for analysis automatically.</p>
+                        <div className="card bg-base-100 shadow-xl border border-base-300">
+                            <div className="card-body items-center text-center">
+                                <div className="text-4xl text-primary">🔄</div>
+                                <h3 className="card-title mt-2">Preprocess Data</h3>
+                                <p>AI will clean and prepare your data for analysis automatically.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div className="card bg-base-100 shadow-xl border border-base-300">
-                        <div className="card-body items-center text-center">
-                            <div className="text-4xl text-primary">💡</div>
-                            <h3 className="card-title mt-2">Retrieve Themes</h3>
-                            <p>Identify and summarize the core themes present in your responses.</p>
+                        <div className="card bg-base-100 shadow-xl border border-base-300">
+                            <div className="card-body items-center text-center">
+                                <div className="text-4xl text-primary">💡</div>
+                                <h3 className="card-title mt-2">Retrieve Themes</h3>
+                                <p>Identify and summarize the core themes present in your responses.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div className="card bg-base-100 shadow-xl border border-base-300">
-                        <div className="card-body items-center text-center">
-                            <div className="text-4xl text-primary">📈</div>
-                            <h3 className="card-title mt-2">Gain Insights</h3>
-                            <p>Understand your data faster and make more informed decisions.</p>
+                        <div className="card bg-base-100 shadow-xl border border-base-300">
+                            <div className="card-body items-center text-center">
+                                <div className="text-4xl text-primary">📈</div>
+                                <h3 className="card-title mt-2">Gain Insights</h3>
+                                <p>Understand your data faster and make more informed decisions.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                </section>
+
+
+                
 
 
                 <div className="hero bg-base-200 min-h-screen">
@@ -165,92 +168,7 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
                     </div>
                 </div>
 
-                <section className="px-8 my-16">
-                    <h1 className="text-center">How to start using eduThemes!</h1>
-                    <ul className="steps steps-vertical lg:steps-horizontal w-full content-center">
-                        <li className="step step-primary" data-content="1">Click 'Start Analysis'</li>
-                        <li className="step" data-content="2">Upload your data file</li>
-                        <li className="step" data-content="3">Review and edit labels</li>
-                        <li className="step" data-content="4">Run the analysis</li>
-                        <li className="step" data-content="5">Explore the themes</li>
-                        
-                    </ul>
-                </section>
-
                 
-                {/*             
-                                <section className="container mx-auto px-4 py-16">
-                                    <h2 className="text-4xl font-bold text-center mb-10">How It Works</h2>
-                                    <ul className="steps steps-vertical lg:steps-horizontal w-full">
-                                        <li className="step step-primary" data-content="1">Click 'Start Analysis'</li>
-                                        <li className="step step-primary" data-content="2">Upload your data file</li>
-                                        <li className="step" data-content="3">Review and edit labels</li>
-                                        <li className="step" data-content="4">Run the analysis</li>
-                                        <li className="step" data-content="5">Explore the themes</li>
-                                    </ul>
-                                </section>
-                */}
-                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                    
-                    <button
-                        className="btn btn-wide btn-primary"
-                        variant="primary"
-                        onClick={startSession}
-                        style={{
-                            fontWeight: 'bold',
-                            padding: '5px 20px',
-                            fontSize: '16px',
-                        }}
-                    >
-                        Start Analysis
-                    </button>
-                </div>
-                <hr/>
-                <div>
-                    <div style={sectionTitleStyle}>Features</div>
-                    <div style={featuresStyle}>
-                        <div style={featureItemStyle}>
-                            <FaFileAlt style={iconStyle} />
-                            <div>Upload<br />text responses</div>
-                        </div>
-                        <div style={featureItemStyle}>
-                            <FaSyncAlt style={iconStyle} />
-                            <div>Preprocess<br />your data</div>
-                        </div>
-                        <div style={featureItemStyle}>
-                            <FaListUl style={iconStyle} />
-                            <div>Retrieve<br />main themes</div>
-                        </div>
-                        <div style={featureItemStyle}>
-                            <FaLightbulb style={iconStyle} />
-                            <div>Gain<br />key insights</div>
-                        </div>
-                    </div>
-                </div>
-                <hr/>
-                <div style={{
-                    fontSize: '24px',
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    marginTop: '40px',
-                    marginBottom: '10px'
-                }}>
-                    How to Use
-                </div>
-                {/*<ul style={{
-                    textAlign: 'left',
-                    maxWidth: '700px',
-                    margin: '0 auto',
-                    lineHeight: '1.8',
-                    fontSize: '16px'
-                }}>*/}
-                    {/*<li><strong>Start an Analysis:</strong> Click the "Start Analysis" button to begin.</li>*/}
-                    {/*<li><strong>Upload Your Dataset:</strong> Upload your file of text responses.</li>*/}
-                    {/*<li><strong>Edit Labels:</strong> Review or modify the preprocessed data (optional).</li>*/}
-                    {/*<li><strong>Run the Analysis:</strong> AI will group similar responses into themes.</li>*/}
-                    {/*<li><strong>View Results:</strong> Explore the key themes in your data.</li>*/}
-                    {/*<li><strong>Take Action:</strong> Get suggestions based on the findings.</li>*/}
-                {/*</ul>*/}
             </div>
         </div>
     );

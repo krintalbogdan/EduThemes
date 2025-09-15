@@ -2,10 +2,26 @@ import React from 'react';
 //import Navbar from 'react-bootstrap/Navbar';
 //import Container from 'react-bootstrap/Container';
 
-const Header = () => {
+const Header = ({ themeFunc }) => {
     return (
-        <div className="navbar bg-neutral text">
-            <button className="btn btn-ghost text-xl text-white font-extrabold">eduThemes</button>
+
+        <div className="navbar bg-base-100 shadow-sm">
+            <div className="flex-1 navbar-start">
+                <a className="btn btn-ghost text-base-content text-xl">eduThemes</a>
+            </div>
+            <div className="flex-none navbar-center">
+                <input type="checkbox" value="synthwave" className="toggle theme-controller" onClick={(e) => {
+
+                        if (e.target.checked){
+                            themeFunc("dark")
+                        } else{
+                            themeFunc("light")
+                        }
+
+                }} />
+            </div>
+
+            
         </div>
     );
 };

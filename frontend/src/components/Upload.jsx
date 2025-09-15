@@ -84,32 +84,31 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
     };
 
     return (
-        <Container
-            className="d-flex flex-column justify-content-center align-items-center"
-            style={{ height: '80vh' }}
-        >
-            <Card className="w-75 mx-auto shadow-sm">
-                <Card.Header className="bg-primary text-white">
-                    <h4 className="mb-0">Upload Dataset & Project Details</h4>
-                </Card.Header>
+        
+ 
+        <div class="grid grid-cols-1 justify-items-center p-8">
+             <h1 className="my-10">Upload Dataset & Project Details</h1>
+        <div className="mockup-window bg-base-100 border border-base-300 min-w-4xl">
+            <Card className="w-100 mx-auto shadow-sm m-10 ">
+
                 <Card.Body>
                     {error && <Alert variant="danger">{error}</Alert>}
 
                     <Row className="mb-4">
                         <Col>
                             <Form.Group controlId="formResearchQuestion" className="mb-3">
-                               
-                                <Form.Label className="text-start fw-bold w-100">Research Question <span className="text-danger">*</span></Form.Label>
-                                <input className="textarea textarea-info textarea-lg"
+
+                                <fieldset className="fieldset">
+                                    <legend className="fieldset-legend">Research Question</legend>
+                                    <input className="textarea textarea-info textarea-lg"
                                     type="text" 
                                     placeholder="What do you want to learn from this data?" 
                                     value={researchQuestion} 
                                     onChange={(e) => setResearchQuestion(e.target.value)} 
                                     required
-                                />
-                                <Form.Text className="text-muted">
-                                    Example: "How do students perceive AI tools in education?"
-                                </Form.Text>
+                                    />
+                                    <p className="label">Example: "How do students perceive AI tools in education?"</p>
+                                </fieldset>
                                 
                                 {/*
                                 <fieldset className="fieldset">
@@ -205,7 +204,8 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
                     </div>
                 </Card.Body>
             </Card>
-        </Container>
+        </div>
+        </div>
     );
 };
 
