@@ -156,9 +156,11 @@ const Preview = ({
     const percentageCoded = totalResponses > 0 ? ((codedCount / totalResponses) * 100).toFixed(1) : 0;
 
     return (
-        <Container fluid className="d-flex justify-content-center align-items-start p-0" style={{ padding: '0', height: '90vh' }}>
-            <Row className="h-100 m-0 w-100 gap-3">
-                <Col xs={3} className="p-2 bg-light h-100">
+        <Container fluid className="max-w-screen" style={{ padding: '0', height: '90vh' }}>
+            {/*COL*/}
+            <Row className="grid grid-flow-col gap-4">
+                {/*ROW 1*/}
+                <Col xs={3} className="row-span-3 grid grid-rows-subgrid gap-4 max-w-80">
                     <Card className="mb-2" style={{ height: "20%" }}>
                         <Card.Body className="rounded d-flex flex-column">
                             <h5>Manual Coding</h5><hr/>
@@ -168,7 +170,7 @@ const Preview = ({
                             {error && <Alert variant="danger">{error}</Alert>}
                         </Card.Body>
                     </Card>
-
+                    {/*ROW2*/}
                     <Card className="mb-2">
                         <Card.Body className="rounded d-flex flex-column">
                             <div className="d-flex justify-content-between align-items-center mb-2">
@@ -304,9 +306,9 @@ const Preview = ({
                     </Card>
                 </Col>
 
-                <Col xs={8} className="p-2 h-100 d-flex bg-light flex-column">
-                    <Card className="flex-grow-1">
-                        <Card.Header className="d-flex justify-content-between align-items-center">
+                <Col xs={8} className="grid grid-flow-col grid-cols-1 gap-4">
+                    <Card className="flex-grow-1 row-span-2">
+                        <Card.Header className="navbar bg-base-100 shadow-sm">
                             <div className="d-flex align-items-center">
                                 <LabelModal labels={labels || []} setLabels={setLabels} />
                                 <Button 
@@ -355,13 +357,13 @@ const Preview = ({
                                 </Button>
                             </div>
                         </Card.Header>
-                        <Card.Body style={{ height: '1px' }}>
+                        <Card.Body>
                             <div 
-                                className="bg-light border"
+                                className="overflow-x-auto max-h-160"
                                 style={{ height: '100%', overflowY: 'auto' }}
                             >
                                 {dataset && dataset.length > 0 ? (
-                                    <Table striped hover bordered size="sm" className="m-0">
+                                    <table className="table table-xs">
                                         <thead>
                                             <tr>
                                                 <th 
@@ -420,7 +422,7 @@ const Preview = ({
                                                 </tr>
                                             ))}
                                         </tbody>
-                                    </Table>
+                                    </table>
                                 ) : (
                                     <p className="text-muted text-center m-3">
                                         No dataset available. Please upload a dataset.

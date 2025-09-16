@@ -83,8 +83,7 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
         }
     };
 
-    return (
-        
+    {/* 
  
         <div class="grid grid-cols-1 justify-items-center p-8">
              <h1 className="my-10">Upload Dataset & Project Details</h1>
@@ -110,12 +109,12 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
                                     <p className="label">Example: "How do students perceive AI tools in education?"</p>
                                 </fieldset>
                                 
-                                {/*
+                                
                                 <fieldset className="fieldset">
                                     <legend className="fieldset-legend">What is your name?</legend>
                                     <input type="text" className="input" placeholder="Type here" />
                                     <p className="label">Optional</p>
-                                </fieldset>*/}
+                                </fieldset>
                             </Form.Group>
 
                             <Form.Group controlId="formProjectDescription" className="mb-3">
@@ -205,6 +204,140 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
                 </Card.Body>
             </Card>
         </div>
+        </div>*/}
+
+    return (
+       
+        <div className="bg-slate-50 min-h-screen grid grid-cols-1 justify-items-center p-4 sm:p-8">
+            <div className="text-center">
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 my-10">
+                    Upload Dataset & Project Details
+                </h1>
+            </div>
+
+            <div className="mockup-window bg-base-100 border border-base-300 w-full max-w-4xl shadow-2xl">
+                <div className="p-8 md:p-12">
+                    {/* -- Alert -- */}
+                    {error && (
+                        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md" role="alert">
+                            <p className="font-bold">Error</p>
+                            <p>{error}</p>
+                        </div>
+                    )}
+                    
+                    <form>
+                        {/* -- Research Question -- */}
+                        <div className="mb-8">
+                            <fieldset className="border border-gray-300 p-4 rounded-lg">
+                                <legend className="px-2 text-base font-semibold text-gray-700">Research Question <span className="text-red-500">*</span></legend>
+                                <input
+                                    className="textarea textarea-info textarea-lg w-full"
+                                    type="text"
+                                    placeholder="What do you want to learn from this data?"
+                                    value={researchQuestion}
+                                    onChange={(e) => setResearchQuestion(e.target.value)}
+                                    required
+                                />
+                                <p className="text-sm text-gray-500 mt-2">Example: "How do students perceive AI tools in education?"</p>
+                            </fieldset>
+                        </div>
+
+                        {/* -- Project Description -- */}
+                        <div className="mb-8">
+                            <label htmlFor="projectDescription" className="block text-base font-semibold text-gray-700 mb-2">
+                                Project Description <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                id="projectDescription"
+                                rows="3"
+                                placeholder="Briefly describe your project"
+                                value={projectDescription}
+                                onChange={(e) => setProjectDescription(e.target.value)}
+                                className="block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required
+                            />
+                            <p className="mt-2 text-sm text-gray-500">
+                                Explain the context and goals of your research to help the system better understand your data.
+                            </p>
+                        </div>
+
+                        {/* -- Two-Column Layout for Optional Fields -- */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            {/* -- Additional Context -- */}
+                            <div>
+                                <label htmlFor="additionalContext" className="block text-base font-semibold text-gray-700 mb-2">
+                                    Additional Context <span className="font-normal text-gray-500">(Optional)</span>
+                                </label>
+                                <textarea
+                                    id="additionalContext"
+                                    rows="3"
+                                    placeholder="Any additional details about the data or participants"
+                                    value={additionalContext}
+                                    onChange={(e) => setAdditionalContext(e.target.value)}
+                                    className="block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                />
+                            </div>
+                            {/* -- API Key -- */}
+                            <div>
+                                <label htmlFor="apiKey" className="block text-base font-semibold text-gray-700 mb-2">
+                                    Anthropic API Key
+                                </label>
+                                <input
+                                    id="apiKey"
+                                    type="password"
+                                    placeholder="Enter your Anthropic API key"
+                                    value={apiKey}
+                                    onChange={(e) => setApiKey(e.target.value)}
+                                    className="block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                />
+                                 <p className="mt-2 text-sm text-gray-500">
+                                    Your key is sent directly to the API and not stored on our servers.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* -- File Upload -- */}
+                        <div className="mb-8">
+                            <label htmlFor="fileUpload" className="block text-base font-semibold text-gray-700 mb-2">
+                                Upload File <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                id="fileUpload"
+                                type="file"
+                                accept=".xlsx,.xls,.csv"
+                                onChange={handleFileChange}
+                                required
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                            />
+                            <p className="mt-2 text-sm text-gray-500">
+                                Upload an Excel or CSV file. The first column should contain the responses to analyze.
+                            </p>
+                        </div>
+                        
+                        {/* -- Submit Button -- */}
+                        <div className="flex justify-end mt-10">
+                            <button
+                                type="button"
+                                onClick={uploadDataset}
+                                disabled={!file || !sessionId || !projectDescription || !researchQuestion || isLoading}
+                                className="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Processing...
+                                    </>
+                                ) : (
+                                    'Upload & Continue'
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 };

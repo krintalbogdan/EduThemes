@@ -112,14 +112,14 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
                 <div className="container bg-base-300 max-w-screen px-4 py-16">
                     <h2 className="text-4xl font-bold text-center m-10">Features</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 m-16 mt-13">
-                        <div className="card shadow-xl border border-base-300">
+                        <div className="card bg-base-100 shadow-xl border border-base-300">
                             <div className="card-body items-center text-center text-base-content ">
                                 <div className="text-4xl text-primary">📄</div>
                                 <h3 className="card-title mt-2">Upload Data</h3>
                                 <p>Easily upload your text responses in a single CSV or Excel file.</p>
                             </div>
                         </div>
-                        <div className="card bg-base-100 shadow-xl">
+                        <div className="card bg-base-100 shadow-xl border border-base-300">
                             <div className="card-body items-center text-center">
                                 <div className="text-4xl text-primary">🔄</div>
                                 <h3 className="card-title mt-2">Preprocess Data</h3>
