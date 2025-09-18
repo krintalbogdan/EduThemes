@@ -8,10 +8,9 @@ import Review from "./components/Review";
 import Analyze from "./components/Analyze";
 import Chatbot from "./components/Chatbot";
 
-//import { Container } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 function App() {
-  const [theme, setTheme] = useState('light'); // 'light' or 'dark'
   const [sessionId, setSessionId] = useState(null);
   const [dataset, setDataset] = useState(null);
   const [visualization, setVisualization] = useState(null);
@@ -40,10 +39,9 @@ function App() {
   };
 
   return (
-    <div className="App" data-theme={theme}>
-      <Header themeFunc={setTheme}/>
-      <div>
-        {/*</Container>*/}
+    <div className="App">
+      <Header />
+      <Container>
         {currentStage === "start" && (
           <Start
             onSessionStart={handleSessionStart}
@@ -108,8 +106,7 @@ function App() {
             />
           </div>
         )}
-      </div>
-      {/*</Container>*/}
+      </Container>
       <Chatbot 
         sessionId={sessionId} 
         currentStage={currentStage} 
