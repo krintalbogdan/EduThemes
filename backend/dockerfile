@@ -9,6 +9,9 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Copy in the source code
 COPY src ./src
+COPY app.py app.py
+COPY routes.py routes.py
+COPY run_pipeline.py run_pipeline.py
 EXPOSE 1500
 
 # Setup an app user so the container doesn't run as the root user
