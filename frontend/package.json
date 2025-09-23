@@ -53,6 +53,6 @@
     "@babel/plugin-transform-private-property-in-object": "^7.25.9",
     "@vitejs/plugin-react": "^5.0.2",
     "daisyui": "^5.1.10",
-    "vite": "^7.1.5"
+    "vite": "^7.1.7"
   }
 }

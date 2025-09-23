@@ -1,0 +1,15 @@
+FROM nginx
+COPY dist /usr/share/nginx/html
+EXPOSE 3000
+#WORKDIR /usr/local/app
+
+# Install the application dependencies
+# copy package.json ./
+# RUN npm install
+
+# Copy in the source code
+# COPY dist ./dist
+
+
+# Setup an app user so the container doesn't run as the root user
+# gunicorn -w 4 -b :1500 'app:create_app()' -c gunicorn.conf.ini   
