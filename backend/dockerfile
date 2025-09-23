@@ -16,4 +16,4 @@ RUN useradd app
 USER app
 
 # gunicorn -w 4 -b :1500 'app:create_app()' -c gunicorn.conf.ini   
-CMD ["gunicorn", "-w", "4", "-b", ":1500",  "'app:create_app()'", "-c", "gunicorn.conf.ini"]
+CMD ["gunicorn", "-w", "4", "-b", ":1500",  "app:create_app()", "-c", "gunicorn.conf.ini"]
