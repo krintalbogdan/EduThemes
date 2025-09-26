@@ -6,7 +6,7 @@ WORKDIR /usr/local/app
 # Install the application dependencies
 COPY requirements.txt ./
 COPY gunicorn.conf.py ./
-RUN sudo apt-get update && sudo apt-get install supervisor -y
+RUN sudo apt update && sudo apt install supervisor
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 # start supervisor
