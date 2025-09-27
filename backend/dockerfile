@@ -35,4 +35,4 @@ USER app
 
 # gunicorn -w 4 -b :1500 'app:create_app()' -c gunicorn.conf.ini   
 
-CMD ["gunicorn", "-w", "4", "-b", ":1500", "app:create_app()", "-c", "gunicorn.conf.py"]  
+CMD ["nohup", "gunicorn", "-w", "4", "-b", ":1500", "app:create_app()", "-c", "gunicorn.conf.py"]  
