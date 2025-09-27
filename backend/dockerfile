@@ -33,6 +33,6 @@ USER app
 
 # CMD ["sudo", "service", "supervisor", "start"]
 
-# gunicorn -w 4 -b :1500 'app:create_app()' -c gunicorn.conf.ini   
+# gunicorn -w 4 -b 0.0.0.0:1500 'app:create_app()' -c gunicorn.conf.ini   
 
-# CMD ["gunicorn", "-w", "4", "-b", ":1500", "app:app", "-c", "gunicorn.conf.py", "-D"]  
+CMD ["gunicorn", "-w", "4", "app:app", "-c", "gunicorn.conf.py"]  
