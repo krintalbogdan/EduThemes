@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Container } from 'react-bootstrap';
 import axios from 'axios';
 import { FaFileAlt, FaSyncAlt, FaListUl, FaLightbulb } from 'react-icons/fa';
@@ -6,10 +6,14 @@ import { MdHeight } from 'react-icons/md';
 
 const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
 
+    useEffect(() =>{
+        console.log(import.meta.env.VITE_URL)
+    })
+
     const startSession = async () => {
         try {
             setLabels([]);
-            const response = await axios.post('http://localhost:1500/session/start');
+            const response = await axios.post(`http://${import.meta.env.VITE_URL}/session/start`);
             onSessionStart(response.data.session_id);
             onAdvanceStage();
         } catch (error) {

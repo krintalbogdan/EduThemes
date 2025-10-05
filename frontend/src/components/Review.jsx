@@ -207,7 +207,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
             setDataset(updatedDataset);
 
             const response = await axios.post(
-                `http://localhost:1500/session/${sessionId}/submit-final-dataset`,
+                `http://${import.meta.env.VITE_URL}/session/${sessionId}/submit-final-dataset`,
                 { 
                     dataset: updatedDataset,
                     apiKey: projectMetadata.apiKey
