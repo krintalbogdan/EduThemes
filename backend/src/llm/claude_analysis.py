@@ -4,16 +4,13 @@ import pandas as pd
 from anthropic import Anthropic
 from typing import List, Dict, Any
 import random
-import openai
 
-deflt_key = os.getenv('OPENAI_API_KEY')
-class openai_frame:
+deflt_key = os.getenv('CLAUDE_KEY')
+class claude_llm:
     @staticmethod
     def suggest_themes(responses, research_question="", project_description="", predefined_themes=None, api_key=deflt_key, max_themes=8):
-        client = openai.OpenAI(
-            api_key=api_key,
-            base_url="https://api.ai.it.ufl.edu" # LiteLLM Proxy is OpenAI compatible, Read More: https://docs.litellm.ai/docs/proxy/user_keys
-        )
+        
+        client = Anthropic(api_key=api_key)
         
         predefined_text = ""
         if predefined_themes and len(predefined_themes) > 0:
@@ -53,25 +50,13 @@ class openai_frame:
         last_error = None
         
         try:
-            '''
             response = client.messages.create(
                 model="claude-3-7-sonnet-20250219",
                 max_tokens=1000,
                 messages=[{"role": "user", "content": prompt}]
             )
-            '''
-            response = client.chat.completions.create(
-                model="gpt-oss-120b", # model to send to the proxy
-                max_tokens=1000,
-                messages = [
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
-            #result_text = response #.content[0].text
-            result_text = response.choices[0].message.content
+            
+            result_text = response.content[0].text
             json_start = result_text.find('[')
             json_end = result_text.rfind(']') + 1
             
@@ -109,7 +94,7 @@ class openai_frame:
     @staticmethod
     def classify_responses_by_themes(responses, themes, research_question="", project_description="", api_key=deflt_key, batch_size=10):
         if api_key is None or api_key == '':
-            #api_key = os.environ.get("ANTHROPIC_API_KEY")
+            api_key = os.environ.get("ANTHROPIC_API_KEY")
             if not api_key:
                 # back-up, if api-key not stored right, randomize themes
                 classifications = {}
@@ -119,10 +104,7 @@ class openai_frame:
                     classifications[theme_name] = selected_indices
                 return classifications
         
-        client = openai.OpenAI(
-            api_key=api_key,
-            base_url="https://api.ai.it.ufl.edu" # LiteLLM Proxy is OpenAI compatible, Read More: https://docs.litellm.ai/docs/proxy/user_keys
-        )
+        client = Anthropic(api_key=api_key)
         
         theme_names = [theme['name'] for theme in themes]
         classifications = {theme_name: [] for theme_name in theme_names}
@@ -178,25 +160,13 @@ class openai_frame:
                 
             try:
                 print(f"Processing batch {i//batch_size + 1}")
-                '''
                 api_response = client.messages.create(
                     model="claude-3-7-sonnet-20250219",
                     max_tokens=1000,
                     messages=[{"role": "user", "content": prompt}]
                 )
-                '''
-                response = client.chat.completions.create(
-                    model="gpt-oss-120b", # model to send to the proxy
-                    max_tokens=1000,
-                    messages = [
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                    ]
-                )
-                #result_text = api_response.content[0].text
-                result_text = response.choices[0].message.content
+                
+                result_text = api_response.content[0].text
                 json_start = result_text.find('[')
                 json_end = result_text.rfind(']') + 1
                 
@@ -242,10 +212,7 @@ class openai_frame:
             if not api_key:
                 print("No API key provided.")
         
-        client = openai.OpenAI(
-            api_key=api_key,
-            base_url="https://api.ai.it.ufl.edu" # LiteLLM Proxy is OpenAI compatible, Read More: https://docs.litellm.ai/docs/proxy/user_keys
-        )
+        client = Anthropic(api_key=api_key)
         
         theme_stats = {}
         total_responses = len(responses)
@@ -314,19 +281,13 @@ class openai_frame:
         
         try:
             print(f"Generating summary")
-            response = client.chat.completions.create(
-                    model="gpt-oss-120b", # model to send to the proxy
-                    messages = [
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                    ]
-                )
-            #result_text = api_response.content[0].text
-            summary_text = response.choices[0].message.content
+            response = client.messages.create(
+                model="claude-3-7-sonnet-20250219",
+                max_tokens=2000,
+                messages=[{"role": "user", "content": prompt}]
+            )
             
-            #summary_text = response.content[0].text
+            summary_text = response.content[0].text
             return summary_text
                 
         except Exception as e:
@@ -340,10 +301,7 @@ class openai_frame:
                 print("No API key provided.")
                 return "I can help analyze your dataset and explain the themes I've identified. What would you like to know more about?"
         
-        client = openai.OpenAI(
-            api_key=api_key,
-            base_url="https://api.ai.it.ufl.edu" # LiteLLM Proxy is OpenAI compatible, Read More: https://docs.litellm.ai/docs/proxy/user_keys
-        )
+        client = Anthropic(api_key=api_key)
         
         theme_stats = []
         total_responses = len(responses)
@@ -381,26 +339,12 @@ class openai_frame:
         
         
         try:
-            '''
             response = client.messages.create(
                 model="claude-3-7-sonnet-20250219",
                 max_tokens=1000,
                 messages=[{"role": "user", "content": prompt}]
             )
             return response.content[0].text
-            '''
-            response = client.chat.completions.create(
-                    model="gpt-oss-120b", # model to send to the proxy
-                    max_tokens=1000,
-                    messages = [
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                    ]
-                )
-            #result_text = api_response.content[0].text
-            return response.choices[0].message.content
                 
         except Exception as e:
             print(f"Error processing chat query: {str(e)}")

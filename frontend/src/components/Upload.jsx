@@ -145,8 +145,8 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
                         </Col>
                         <Col md={6}>
                             <Form.Group controlId="formApiKey" className="mb-3">
-                                <Form.Label className="text-start fw-bold w-100">Anthropic API Key </Form.Label>
-                                <Form.Control 
+                                <Form.Label className="text-start fw-bold w-100">Select an LLM Model</Form.Label>
+                                {/*<Form.Control 
                                     type="password" 
                                     placeholder="Enter your Anthropic API key for Claude" 
                                     value={apiKey} 
@@ -154,7 +154,13 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
                                 />
                                 <Form.Text className="text-muted">
                                     Enter API key here.
-                                </Form.Text>
+                                </Form.Text>*/}
+                                <Form.Select aria-label="Default select example" onChange={(e) => setApiKey(e.target.value)}>
+                                    <option>Select Model</option>
+                                    {/*<option value="llama">LLaMa</option>*/}
+                                    <option value="claude">Claude</option>
+                                    <option value="chatgpt">ChatGPT</option>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                     </Row>

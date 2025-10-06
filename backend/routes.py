@@ -10,7 +10,9 @@ import pandas as pd
 import json
 import base64
 import random
-from src.llm.theme_analysis import suggest_themes, classify_responses_by_themes, generate_summary, process_chat_query
+#from src.llm.claude_analysis import suggest_themes, classify_responses_by_themes, generate_summary, process_chat_query
+
+from src.llm.serve_llm import serve_llm
 
 routes_bp = Blueprint('routes', __name__)
 
@@ -299,13 +301,17 @@ def get_theme_suggestions(session_id):
             
         research_question = session['research_question']
         project_description = session['project_description']
+
+        # CURRENT STATE
+        llm_instance = serve_llm(api_key)
+        print(api_key, llm_instance)
         
-        suggested_themes = suggest_themes(
+        suggested_themes = llm_instance.suggest_themes(
             responses=responses,
             research_question=research_question,
             project_description=project_description,
-            predefined_themes=predefined_themes,
-            api_key=api_key
+            predefined_themes=predefined_themes
+            #api_key=api_key
         )
         
         return jsonify({
@@ -393,13 +399,14 @@ def submit_final_dataset(session_id):
                 project_description = session['project_description']
                 
                 if api_key:
-                    summary = generate_summary(
+                    llm_instance = serve_llm(api_key)
+                    summary = llm_instance.generate_summary(
                         responses=responses,
                         themes=labels,
                         classifications=classifications,
                         research_question=research_question,
                         project_description=project_description,
-                        api_key=api_key
+                        #api_key=api_key
                     )
                 else:
                     summary = ""
@@ -497,13 +504,14 @@ def submit_manual_coding(session_id):
         project_description = session['project_description']
         
         try:
-            
-            classifications = classify_responses_by_themes(
+            # CURRENT STATE
+            llm_instance = serve_llm(api_key)
+            classifications = llm_instance.classify_responses_by_themes(
                 responses=responses,
                 themes=labels,
                 research_question=research_question,
                 project_description=project_description,
-                api_key=api_key
+                #api_key=api_key
             )
             
             return jsonify({
@@ -660,14 +668,15 @@ def analyze_text(session_id):
         else:
             classifications = {}
             
-        response_text = process_chat_query(
+        llm_instance = serve_llm(api_key)
+        response_text = llm_instance.process_chat_query(
             query=user_message,
             responses=responses,
             themes=labels,
             classifications=classifications,
             research_question=research_question,
-            project_description=project_description,
-            api_key=api_key
+            project_description=project_description
+            #api_key==api_key
         )
         
         return jsonify({
