@@ -40,7 +40,7 @@ const Preview = ({
         }
         saveThemes();
         setSelectedIndex(index);
-        setSelectedEntry(entry);
+        setSelectedEntry(entry);//console.log(selectedEntry.original));
     };
 
     const handleThemeChange = (e) => {
@@ -53,6 +53,7 @@ const Preview = ({
                 ...prev,
                 themes: [...(prev.themes || []), theme],
             }));
+
             e.target.value = '';
             saveThemes();
         }
@@ -67,13 +68,25 @@ const Preview = ({
         }
     };
 
-    const removeTheme = (themeName) => {
-        setSelectedEntry((prev) => ({
-            ...prev,
-            themes: prev.themes?.filter((theme) => theme.name !== themeName) || [],
-        }));
+    const removeTheme = (themeName, ind = null, themeIndex = null) => {
+        if (ind != null) { 
+            let updatedDataset = [...dataset];
+            // Remove the theme at the specified themeIndex from the themes array
+            updatedDataset[ind].themes = updatedDataset[ind].themes?.filter((_, idx) => idx !== themeIndex) || [];
+            setDataset(updatedDataset);
+            //console.log('REMOVED', updatedDataset);
+        }
+        else{
+            console.log('huh')
+            setSelectedEntry((prev) => ({
+                ...prev,
+                themes: prev.themes?.filter((theme) => theme.name !== themeName) || [],
+            }));
+            saveThemes();
+            //setTimeout(() => saveThemes(), 0);
+        }
         
-        setTimeout(() => saveThemes(), 0);
+       
     };
 
     const handleGetSuggestedThemes = async () => {
@@ -85,7 +98,7 @@ const Preview = ({
                 setSuggestedThemes([]);
             }
             
-            const response = await axios.post(`http://${import.meta.env.VITE_URL}/session/${sessionId}/suggest-themes`, {
+            const response = await axios.post(`${import.meta.env.VITE_URL}/session/${sessionId}/suggest-themes`, {
                 labels: labels,
                 apiKey: projectMetadata.apiKey
             });
@@ -133,7 +146,7 @@ const Preview = ({
 
             console.log(`Submitting ${manualCodings.length} manually coded responses`);
 
-            const response = await axios.post(`http://${import.meta.env.VITE_URL}/session/${sessionId}/submit-manual-coding`, {
+            const response = await axios.post(`${import.meta.env.VITE_URL}/session/${sessionId}/submit-manual-coding`, {
                 labels,
                 manual_codings: manualCodings,
                 apiKey: projectMetadata.apiKey
@@ -240,7 +253,7 @@ const Preview = ({
                                     <strong>Selected Response</strong>
                                     <hr />
                                     <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
-
+                                        { console.log('--',selectedEntry.original)}
                                     <p><strong>Original:</strong> {selectedEntry.original}</p>
                                     <p><strong>Cleaned:</strong> {selectedEntry.cleaned}</p>
                                     <Form.Group controlId="formThemes">
@@ -376,6 +389,7 @@ const Preview = ({
                                         </thead>
                                         <tbody>
                                             {dataset.map((entry, index) => (
+                                                
                                                 <tr 
                                                     key={index} 
                                                     onClick={() => handleSelectEntry(entry, index)}                                                     
@@ -400,17 +414,39 @@ const Preview = ({
                                                     </td>
                                                     <td className="align-middle">
                                                         <div className="d-flex flex-wrap gap-1">
+                                                            <Form.Control
+                                                                type="text"
+                                                                
+                                                                placeholder="Select a theme..."
+                                                                list="theme-options"
+                                                                onChange={handleThemeChange}
+                                                                className="mt-2"
+                                                            />
                                                             {entry.themes && entry.themes.length > 0 ? 
                                                                 entry.themes.map((theme, tidx) => (
+                                                                    
                                                                     <Badge
                                                                         key={tidx}
+
                                                                         bg={null}
                                                                         style={{
                                                                             backgroundColor: theme.color,
                                                                             fontSize: '0.7rem'
                                                                         }}
+                                                                        //temp
+                                                                        onClick={() => {removeTheme(theme,index,tidx)}} //remove theme
                                                                     >
                                                                         {theme.name}
+                                                                        {/*<Badge
+                                                                            bg={null}
+                                                                            style={{
+                                                                                backgroundColor: theme.color,
+                                                                                marginRight: '5px',
+                                                                                marginBottom: '5px',
+                                                                                cursor: 'pointer',
+                                                                            }}
+                                                                            onClick={() => removeTheme(entry.themes.name)}
+                                                                        ></Badge>*/}
                                                                     </Badge>
                                                                 )) : 
                                                                 <span className="text-muted small">None</span>
@@ -446,7 +482,7 @@ const Preview = ({
                         <span>
                             {suggestedThemes.length > 0 ? 
                                 `Found ${suggestedThemes.length} theme suggestions` : 
-                                "No theme suggestions available."}
+                                "Generate themes"}
                         </span>
                         <Button 
                             variant="outline-primary" 
@@ -504,7 +540,7 @@ const Preview = ({
                             })}
                         </ListGroup>
                     ) : (
-                        <p className="text-center text-muted">No theme suggestions available. Click "Refresh Suggestions" to generate new themes.</p>
+                        <p className="text-center text-muted">Click "Refresh Suggestions" to generate new themes.</p>
                     )}
                 </Modal.Body>
                 <Modal.Footer>

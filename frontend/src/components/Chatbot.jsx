@@ -70,7 +70,7 @@ const Chatbot = ({ sessionId, currentStage, projectMetadata }) => {
     setIsLoading(true);
     
     try {
-      const response = await axios.post(`http://${import.meta.env.VITE_URL}/session/${sessionId}/analyze-text`, {
+      const response = await axios.post(`${import.meta.env.VITE_URL}/session/${sessionId}/analyze-text`, {
         message: userMessage,
         currentStage: currentStage,
         apiKey: projectMetadata?.apiKey || ""

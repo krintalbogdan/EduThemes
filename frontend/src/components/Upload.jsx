@@ -57,7 +57,7 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
 
         setIsLoading(true);
         try {
-            const response = await axios.post(`http://${import.meta.env.VITE_URL}/session/${sessionId}/upload-dataset`, formData, {
+            const response = await axios.post(`${import.meta.env.VITE_URL}/session/${sessionId}/upload-dataset`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -73,6 +73,7 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
             });
 
             setDataset(response.data.preprocessed_dataset);
+            console.log(response.data.preprocessed_dataset);
             setVisualization(response.data.visualization_image);
             onAdvanceStage();
         } catch (err) {

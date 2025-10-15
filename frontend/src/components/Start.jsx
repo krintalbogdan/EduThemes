@@ -6,14 +6,10 @@ import { MdHeight } from 'react-icons/md';
 
 const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
 
-    useEffect(() =>{
-        console.log(import.meta.env.VITE_URL)
-    })
-
     const startSession = async () => {
         try {
             setLabels([]);
-            const response = await axios.post(`http://${import.meta.env.VITE_URL}/session/start`);
+            const response = await axios.post(`${import.meta.env.VITE_URL}/session/start`);
             onSessionStart(response.data.session_id);
             onAdvanceStage();
         } catch (error) {

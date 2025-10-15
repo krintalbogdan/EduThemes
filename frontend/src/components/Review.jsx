@@ -10,6 +10,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
     const [error, setError] = useState(null);
     const [showReassignModal, setShowReassignModal] = useState(false);
     const [rejectedEntries, setRejectedEntries] = useState([]);
+    const [showEditLabels, setShowEditLabels] = useState(false);
     
     const unclassifiedTheme = {
         name: "Unclassified",
@@ -207,7 +208,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
             setDataset(updatedDataset);
 
             const response = await axios.post(
-                `http://${import.meta.env.VITE_URL}/session/${sessionId}/submit-final-dataset`,
+                `${import.meta.env.VITE_URL}/session/${sessionId}/submit-final-dataset`,
                 { 
                     dataset: updatedDataset,
                     apiKey: projectMetadata.apiKey
@@ -326,6 +327,14 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                 <h5>
                                     {formattedThemeName}
                                 </h5>
+                                <Button 
+                                    variant="primary" 
+                                    onClick={() => setShowEditLabels(true)}
+                                >
+                                    
+                                    Edit Themes
+                                    
+                                </Button>
                                 <Button 
                                     variant="primary" 
                                     onClick={handleNextTheme} 
@@ -479,6 +488,36 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                     <Button variant="primary" onClick={handleFinishReassignment}>
                         {currentThemeIndex >= allThemes.length - 1 ? 'Finish Review' : 'Next Theme'}
                     </Button>
+                </Modal.Footer>
+            </Modal>
+            {/*EDIT LABELS*/}
+            <Modal 
+                show={showEditLabels} 
+                onHide={() => setShowSuggestions(false)}
+                centered
+                size="lg"
+            >
+                <Modal.Header closeButton>
+                <Modal.Title>Add Themes</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                <Row>
+                    <Col xs={6} md={4}>
+                    <Button className="w-100">Current Theme</Button>
+                    </Col>
+                    <Col xs={6} md={4}>
+                    <Button className="w-100">Add New Theme</Button>
+                    </Col>
+                    <Col xs={6} md={4}>
+                    <Button className="w-100">Generate AI Theme</Button>
+                    </Col>
+                </Row>
+                </Modal.Body>
+
+                <Modal.Footer>
+                <Button variant="secondary">Close</Button>
+                <Button variant="primary">Save changes</Button>
                 </Modal.Footer>
             </Modal>
         </Container>

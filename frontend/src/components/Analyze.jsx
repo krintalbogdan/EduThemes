@@ -25,7 +25,7 @@ const Analyze = ({labels, results, onAdvanceStage, sessionId }) => {
     } else {
       const fetchSummary = async () => {
         try {
-          const response = await axios.get(`http://${import.meta.env.VITE_URL}/session/${sessionId}/download-final-dataset`);
+          const response = await axios.get(`${import.meta.env.VITE_URL}/session/${sessionId}/download-final-dataset`);
           if (response.data && response.data.summary) {
             setSummary(response.data.summary);
           }
@@ -40,7 +40,7 @@ const Analyze = ({labels, results, onAdvanceStage, sessionId }) => {
 
   const handleDownloadJSON = async () => {
     try {
-      const response = await axios.get(`http://${import.meta.env.VITE_URL}/session/${sessionId}/download-final-dataset`);
+      const response = await axios.get(`${import.meta.env.VITE_URL}/session/${sessionId}/download-final-dataset`);
       const data = response.data;
 
       if (response.status === 200) {
