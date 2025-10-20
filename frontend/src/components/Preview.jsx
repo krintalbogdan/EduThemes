@@ -28,6 +28,7 @@ const Preview = ({
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        console.log("hai")
       if (dataset && dataset.length > 0 && selectedEntry === null) {
         setSelectedEntry(dataset[0]);
         setSelectedIndex(0);
@@ -43,20 +44,34 @@ const Preview = ({
         setSelectedEntry(entry);//console.log(selectedEntry.original));
     };
 
-    const handleThemeChange = (e) => {
+    const handleThemeChange = (e, entry = null, index = null) => {
         const newTheme = e.target.value;
-        if (newTheme.trim() === '' || selectedEntry.themes?.some(theme => theme.name === newTheme)) return;
+        if (newTheme.trim() === '') return;
 
         const theme = labels.find(label => label.name === newTheme);
-        if (theme) {
-            setSelectedEntry((prev) => ({
-                ...prev,
-                themes: [...(prev.themes || []), theme],
-            }));
+        if (!theme) return;
 
-            e.target.value = '';
-            saveThemes();
+        if (entry && index !== null) {
+            // Handle table row theme change
+            const updatedDataset = [...dataset];
+            const currentEntry = updatedDataset[index];
+            
+            if (!currentEntry.themes?.some(t => t.name === newTheme)) {
+                currentEntry.themes = [...(currentEntry.themes || []), theme];
+                setDataset(updatedDataset);
+            }
+        } else if (selectedEntry) {
+            // Handle selected entry theme change
+            if (!selectedEntry.themes?.some(t => t.name === newTheme)) {
+                setSelectedEntry((prev) => ({
+                    ...prev,
+                    themes: [...(prev.themes || []), theme],
+                }));
+                saveThemes();
+            }
         }
+
+        e.target.value = '';
     };
 
     const saveThemes = () => {
@@ -174,7 +189,7 @@ const Preview = ({
                 <Col xs={3} className="p-2 bg-light h-100">
                     <Card className="mb-2" style={{ height: "20%" }}>
                         <Card.Body className="rounded d-flex flex-column">
-                            <h5>Manual Coding</h5><hr/>
+                            <h5>Manual Coding</h5><hr style={{ margin: '0px' }}/>
                             <p className="text-muted">
                                 This page allows you to create themes and manually code a sample to train the AI assistant.
                             </p>
@@ -210,8 +225,8 @@ const Preview = ({
                                     </Button> */}
                                 </div>
                             </div>
-                            <hr />
-                            <div style={{ height: '150px', overflowY: 'auto' }}>
+                            <hr style={{ margin: '0px' }} />
+                            <div className="overflow-y-auto" style={{ height: '150px', overflowY: 'auto' }}>
                             {labels.length > 0 ? (
                                 <div >
                                     {labels.map((label, index) => (
@@ -247,16 +262,16 @@ const Preview = ({
                     </Card>
 
                     <Card className="flex-grow-1" style={{ height: '47%' }}>
-                        <Card.Body className="rounded d-flex flex-column" style={{ maxHeight: '100%' }}>
+                        <Card.Body className="rounded d-flex flex-column" id="array_chart" style={{ maxHeight: '100%' }}>
                             {selectedEntry ? (
                                 <>
                                     <strong>Selected Response</strong>
-                                    <hr />
+                                    <hr style={{ margin: '0px' }}/>
                                     <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
                                         { console.log('--',selectedEntry.original)}
                                     <p><strong>Original:</strong> {selectedEntry.original}</p>
                                     <p><strong>Cleaned:</strong> {selectedEntry.cleaned}</p>
-                                    <Form.Group controlId="formThemes">
+                                    {/*<Form.Group controlId="formThemes">
                                         <strong>Assigned Themes</strong>
                                         {selectedEntry.themes?.length === 0 || selectedEntry.themes === undefined ? (
                                             <p className="text-muted mt-2">No themes assigned yet.</p>
@@ -305,7 +320,7 @@ const Preview = ({
                                                 Select from existing themes or add new ones using the "Edit Themes" button.
                                             </small>
                                         </div>
-                                    </Form.Group>
+                                    </Form.Group>*/}
                                     </div>
                                 </>
                             ) : (
@@ -368,7 +383,7 @@ const Preview = ({
                                 </Button>
                             </div>
                         </Card.Header>
-                        <Card.Body style={{ height: '1px' }}>
+                        <Card.Body style={{ height: '1px' }} id="given_chart">
                             <div 
                                 className="bg-light border"
                                 style={{ height: '100%', overflowY: 'auto' }}
@@ -416,12 +431,16 @@ const Preview = ({
                                                         <div className="d-flex flex-wrap gap-1">
                                                             <Form.Control
                                                                 type="text"
-                                                                
                                                                 placeholder="Select a theme..."
                                                                 list="theme-options"
-                                                                onChange={handleThemeChange}
+                                                                onChange={(e) => handleThemeChange(e, entry, index)}
                                                                 className="mt-2"
                                                             />
+                                                            <datalist id="theme-options">
+                                                                {labels.map((label, index) => (
+                                                                    <option key={index} value={label.name} />
+                                                                ))}
+                                                            </datalist>
                                                             {entry.themes && entry.themes.length > 0 ? 
                                                                 entry.themes.map((theme, tidx) => (
                                                                     

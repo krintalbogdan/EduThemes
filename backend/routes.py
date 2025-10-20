@@ -381,8 +381,11 @@ def submit_final_dataset(session_id):
                 else:
                     responses = [entry["original"] for entry in dataset]
             
-                labels_str = session['labels']
-                labels = json.loads(labels_str) if labels_str else []
+                #labels_str = session['labels']
+                #labels = json.loads(labels_str) if labels_str else []
+                labels = data["labels"]
+                print("loaded labels ", labels)
+                print("loaded dataset ", dataset)
                 
                 classifications = {}
                 for theme in labels:

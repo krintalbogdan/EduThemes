@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Card, Row, Col, Modal, Badge, Spinner, Alert, ProgressBar } from 'react-bootstrap';
+import { Container, Button, Card, Row, Col, Modal, Badge, Spinner, Alert, ProgressBar, Nav, Tab, Form, ListGroup, OverlayTrigger} from 'react-bootstrap';
 import { FaCheck, FaTimes, FaUndo } from 'react-icons/fa';
-import axios from 'axios';
+import axios, { all } from 'axios';
 
-const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData, onAdvanceStage, projectMetadata }) => {
+const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset, claudeData, onAdvanceStage, projectMetadata }) => {
     const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
     const [responseActions, setResponseActions] = useState({});
     const [isLoading, setIsLoading] = useState(false);
@@ -11,6 +11,10 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
     const [showReassignModal, setShowReassignModal] = useState(false);
     const [rejectedEntries, setRejectedEntries] = useState([]);
     const [showEditLabels, setShowEditLabels] = useState(false);
+    const [unclassifiedSelections, setUnclassifiedSelections] = useState({});
+    const [suggestedThemes, setSuggestedThemes] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [loadingSuggestions, setLoadingSuggestions] = useState(false);
     
     const unclassifiedTheme = {
         name: "Unclassified",
@@ -19,11 +23,12 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
     };
     
     const hasUnclassifiedTheme = labels.some(label => label.name === "Unclassified");
-    const allThemes = hasUnclassifiedTheme ? labels : [...labels, unclassifiedTheme];
+    let allThemes = hasUnclassifiedTheme ? labels : [...labels, unclassifiedTheme];
     const currentTheme = allThemes[currentThemeIndex] || { name: "None", color: "#cccccc" };
     const themeResponses = claudeData?.[currentTheme.name] || [];
     
     useEffect(() => {
+        
         if (!hasUnclassifiedTheme && claudeData && !claudeData["Unclassified"]) {
             const updatedClaudeData = {...claudeData};
             updatedClaudeData["Unclassified"] = [];
@@ -52,6 +57,8 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
         }));
     };
 
+
+
     const handleUndo = (index) => {
         const updatedActions = [...(responseActions[currentTheme.name] || [])];
         updatedActions[index] = null;
@@ -76,45 +83,67 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
         }));
     };
 
-    const addToUnclassified = (rejectedIndices) => {
-        if (rejectedIndices.length === 0) return;
-        
-        if (!claudeData["Unclassified"]) {
-            claudeData["Unclassified"] = [];
-        }
-
-        const unclassifiedSet = new Set(claudeData["Unclassified"]);
-        
-        rejectedIndices.forEach(idx => {
-            if (!unclassifiedSet.has(idx)) {
-                unclassifiedSet.add(idx);
-            }
-        });
-        
-        claudeData["Unclassified"] = Array.from(unclassifiedSet);
-        
-        if (!responseActions["Unclassified"]) {
-            setResponseActions(prev => ({
-                ...prev,
-                "Unclassified": Array(claudeData["Unclassified"].length).fill(null)
-            }));
-        } else {
-            const existingLength = responseActions["Unclassified"].length;
-            const newLength = claudeData["Unclassified"].length;
-            
-            if (newLength > existingLength) {
-                const updatedActions = [
-                    ...responseActions["Unclassified"], 
-                    ...Array(newLength - existingLength).fill(null)
-                ];
-                
-                setResponseActions(prev => ({
-                    ...prev,
-                    "Unclassified": updatedActions
-                }));
-            }
-        }
-    };
+    {currentTheme.name === "Unclassified" && (
+        <Form.Group>
+            <Form.Control
+                type="text"
+                placeholder="Select a theme..."
+                list={`theme-options`}
+                className="mt-2"
+                onChange={(e) => {
+                    const selectedTheme = e.target.value;
+                    if (selectedTheme && selectedTheme !== "Unclassified") {
+                        const selectedThemeObj = allThemes.find(theme => theme.name === selectedTheme);
+                        if (selectedThemeObj) {
+                            const responseIndex = themeResponses[idx];
+                            
+                            // Initialize theme in claudeData if it doesn't exist
+                            if (!claudeData[selectedTheme]) {
+                                claudeData[selectedTheme] = [];
+                            }
+                            
+                            // Add to new theme using Set to prevent duplicates
+                            const newThemeSet = new Set(claudeData[selectedTheme]);
+                            newThemeSet.add(responseIndex);
+                            claudeData[selectedTheme] = Array.from(newThemeSet);
+                            
+                            // Remove from unclassified using Set
+                            const unclassifiedSet = new Set(claudeData["Unclassified"]);
+                            unclassifiedSet.delete(responseIndex);
+                            claudeData["Unclassified"] = Array.from(unclassifiedSet);
+                            
+                            // Initialize or update response actions for the new theme
+                            setResponseActions(prev => {
+                                const updated = { ...prev };
+                                if (!updated[selectedTheme]) {
+                                    updated[selectedTheme] = Array(claudeData[selectedTheme].length).fill(null);
+                                } else {
+                                    const newLength = claudeData[selectedTheme].length;
+                                    updated[selectedTheme] = [
+                                        ...updated[selectedTheme],
+                                        ...Array(Math.max(0, newLength - updated[selectedTheme].length)).fill(null)
+                                    ];
+                                }
+                                // Mark as approved in the selected theme
+                                updated[selectedTheme][claudeData[selectedTheme].length - 1] = 'approve';
+                                return updated;
+                            });
+                            
+                            // Clear input
+                            e.target.value = "";
+                        }
+                    }
+                }}
+            />
+            <datalist id={`theme-options`}>
+                {allThemes.filter(theme => theme.name !== "Unclassified").map((theme, index) => (
+                    <option key={index} value={theme.name}>
+                        {theme.name}
+                    </option>
+                ))}
+            </datalist>
+        </Form.Group>
+    )}
 
     const handleNextTheme = () => {
         const rejectedIndices = (responseActions[currentTheme.name] || [])
@@ -128,6 +157,36 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
             setCurrentThemeIndex(currentThemeIndex + 1);
         } else {
             handleSubmitFinalDataset();
+        }
+    };
+
+    const handleGetSuggestedThemes = async () => {
+        setLoadingSuggestions(true);
+        setError(null);
+        
+        try {
+            if (showSuggestions) {
+                setSuggestedThemes([]);
+            }
+            
+            const response = await axios.post(`${import.meta.env.VITE_URL}/session/${sessionId}/suggest-themes`, {
+                labels: labels,
+                apiKey: projectMetadata.apiKey
+            });
+
+            if (response.data && response.data.suggested_themes) {
+                setSuggestedThemes(response.data.suggested_themes);
+                if (!showSuggestions) {
+                    setShowSuggestions(true);
+                }
+            } else {
+                setError("No themes could be generated. Please check data or try again.");
+            }
+        } catch (error) {
+            console.error("Error getting suggested themes:", error.response?.data || error.message);
+            setError("Failed to get suggested themes: " + (error.response?.data?.error || error.message));
+        } finally {
+            setLoadingSuggestions(false);
         }
     };
 
@@ -164,6 +223,30 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
         } else {
             setCurrentThemeIndex(currentThemeIndex + 1);
         }
+    };
+
+    const addTheme = (theme) => {
+        // Add to labels state
+        setLabels(prevLabels => [...prevLabels, theme]);
+
+        // Initialize empty array for new theme in claudeData
+        if (!claudeData[theme.name]) {
+            claudeData[theme.name] = [];
+        }
+
+        // Initialize response actions for new theme
+        setResponseActions(prev => ({
+            ...prev,
+            [theme.name]: []  // Empty array since no responses are classified yet
+        }));
+
+        // Update dataset entries to include the new theme structure if needed
+        setDataset(prevDataset => 
+            prevDataset.map(entry => ({
+                ...entry,
+                themes: entry.themes || []  // Ensure themes array exists
+            }))
+        );
     };
 
     const handleSubmitFinalDataset = async () => {
@@ -211,6 +294,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                 `${import.meta.env.VITE_URL}/session/${sessionId}/submit-final-dataset`,
                 { 
                     dataset: updatedDataset,
+                    labels: allThemes,
                     apiKey: projectMetadata.apiKey
                 }
             );
@@ -327,9 +411,11 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                 <h5>
                                     {formattedThemeName}
                                 </h5>
+                                <div className="d-flex align-items-center">
                                 <Button 
                                     variant="primary" 
                                     onClick={() => setShowEditLabels(true)}
+                                    style={{ marginRight: '10px' }}
                                 >
                                     
                                     Edit Themes
@@ -355,6 +441,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                         currentThemeIndex >= allThemes.length - 1 ? 'Finish' : 'Next Theme'
                                     )}
                                 </Button>
+                                </div>
                             </div>
                         </Card.Header>
                         
@@ -449,6 +536,62 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                                                             <FaUndo/>
                                                         </Button>
                                                     )}
+                                                    {currentTheme.name === "Unclassified" && (
+                                                        <Form.Group controlId={`formThemes-${idx}`}>
+                                                            <Form.Control
+                                                                type="text"
+                                                                id={`formThemes-${idx}`}
+                                                                placeholder="Select a theme..."
+                                                                list={`theme-options-${idx}`}
+                                                                className="mt-2"
+                                                                onChange={(e) => {
+                                                                    const selectedTheme = e.target.value;
+                                                                    if (selectedTheme && selectedTheme !== "Unclassified") {
+                                                                        const selectedThemeObj = allThemes.find(theme => theme.name === selectedTheme);
+                                                                        if (selectedThemeObj) {
+                                                                            // Add the response to the selected theme
+                                                                            const responseIndex = themeResponses[idx];
+                                                                            // Initialize claudeData for new theme if needed
+                                                                            if (!claudeData[selectedTheme]) {
+                                                                                claudeData[selectedTheme] = [];
+                                                                            }
+                                                                            // Add response to selected theme if not already there
+                                                                            if (!claudeData[selectedTheme].includes(responseIndex)) {
+                                                                                claudeData[selectedTheme].push(responseIndex);
+                                                                            }
+                                                                            
+                                                                            // Remove from unclassified
+                                                                            claudeData["Unclassified"] = claudeData["Unclassified"].filter(
+                                                                                index => index !== responseIndex
+                                                                            );
+                                                                            
+                                                                            // Initialize and update response actions
+                                                                            setResponseActions(prev => {
+                                                                                const updated = { ...prev };
+                                                                                if (!updated[selectedTheme]) {
+                                                                                    updated[selectedTheme] = Array(claudeData[selectedTheme].length).fill(null);
+                                                                                }
+                                                                                // Mark as approved in the selected theme
+                                                                                const newIndex = claudeData[selectedTheme].length - 1;
+                                                                                updated[selectedTheme][newIndex] = 'approve';
+                                                                                return updated;
+                                                                            });
+                                                                            
+                                                                            // Clear the input
+                                                                            e.target.value = "";
+                                                                        }
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <datalist id={`theme-options-${idx}`}>
+                                                                {allThemes.filter(theme => theme.name !== "Unclassified").map((theme, index) => (
+                                                                    <option key={index} value={theme.name}>
+                                                                        {theme.name}
+                                                                    </option>
+                                                                ))}
+                                                            </datalist>
+                                                        </Form.Group>
+                                                    )}
                                                 </div>
                                             </div>
                                         );
@@ -493,7 +636,7 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
             {/*EDIT LABELS*/}
             <Modal 
                 show={showEditLabels} 
-                onHide={() => setShowSuggestions(false)}
+                onHide={() => setShowEditLabels(false)}
                 centered
                 size="lg"
             >
@@ -502,21 +645,272 @@ const Review = ({ sessionId, labels, setResults, dataset, setDataset, claudeData
                 </Modal.Header>
 
                 <Modal.Body>
-                <Row>
-                    <Col xs={6} md={4}>
-                    <Button className="w-100">Current Theme</Button>
-                    </Col>
-                    <Col xs={6} md={4}>
-                    <Button className="w-100">Add New Theme</Button>
-                    </Col>
-                    <Col xs={6} md={4}>
-                    <Button className="w-100">Generate AI Theme</Button>
-                    </Col>
+                    <Row>
+                    <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+                    
+                        <Col sm={3}>
+                        <Nav variant="pills" className="flex-column">
+                            <Nav.Item>
+                            <Nav.Link eventKey="first">Cur. Themes</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                            <Nav.Link eventKey="second">Add Theme</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                            <Nav.Link eventKey="third">LLM Process</Nav.Link>
+                            </Nav.Item>
+                        </Nav>
+                        </Col>
+                        <Col sm={9}>
+                        <Tab.Content>
+                            <Tab.Pane eventKey="first">
+                                {allThemes.map((label, index) => {
+                                    console.log(label);
+                                    const isComplete = responseActions[label.name] && 
+                                        responseActions[label.name].every(action => action !== null);
+                                    
+                                    return (
+                                        <div 
+                                            key={index}
+                                            className=" align-items-center mb-2"
+                                            style={{ opacity: index === currentThemeIndex ? 1 : 0.7 }}
+                                        >
+                                            <div 
+                                                
+                                            ></div>
+                                            <span style={{ 
+                                                    borderRadius: '10px',
+                                                    padding: '5px', 
+                                                    color: '#fff',
+                                                    backgroundColor: label.color,
+                                                    
+                                                }}>
+                                                {label.name}
+                                            </span>
+                                            <p style={{
+                                                marginTop: '5px',
+                                                marginLeft: '15px'
+                                            }}>{label.description}</p>
+                                        </div>
+                                    );
+                                })}
+
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="second">
+                                <Form> {/*onSubmit={handleSubmit}>*/}
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Theme Name</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Enter theme name"
+                                            //value={newLabel}
+                                            //onChange={(e) => setNewLabel(e.target.value)}
+                                            maxLength={30}
+                                        />
+                                    </Form.Group>
+                                    
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Description</Form.Label>
+                                        <Form.Control
+                                            as="textarea"
+                                            rows={2}
+                                            placeholder="Enter theme description"
+                                            //value={labelDescription}
+                                            //onChange={(e) => setLabelDescription(e.target.value)}
+                                            maxLength={200}
+                                        />
+                                    </Form.Group>
+                                    
+                                    <div className="d-flex mb-3 align-items-center">
+                                        <Form.Label>Theme Color - </Form.Label>
+                                        <Form.Control
+                                            type="color"
+                                            //value={selectedColor}
+                                            //onChange={(e) => setSelectedColor(e.target.value)}
+                                            className="form-control-color m-2"
+                                        />
+
+                                        {true ? (//formMode === 'add' ? (
+                                            <Button 
+                                                variant="success" 
+                                                //onClick={addLabel}
+                                                //disabled={!newLabel.trim() || labels.length >= 10}
+                                                className="d-flex ms-auto"
+                                            >
+                                                Add Theme
+                                            </Button>
+                                        ) : (
+                                            <div className="d-flex ms-auto">
+                                                <Button 
+                                                    variant="primary" 
+                                                    //onClick={updateLabel}
+                                                    className="me-2"
+                                                    //disabled={!newLabel.trim()}
+                                                >
+                                                    Update
+                                                </Button>
+                                                <Button variant="secondary"> {/*onClick={cancelEdit}>*/}
+                                                    Cancel
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </Form>
+                                
+                                <hr />
+                                
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 className="mb-0">Current Themes ({allThemes.length}/10)</h5>
+                                    <Form.Group controlId="formFile">
+                                        <Form.Control 
+                                            type="file" 
+                                            accept=".txt,.csv" 
+                                            //onChange={fileLabel}
+                                            disabled={allThemes.length >= 10}
+                                            size="sm"
+                                        />
+                                        <Form.Text className="text-muted">
+                                            Import themes from CSV or TXT
+                                        </Form.Text>
+                                        <OverlayTrigger
+                                        placement="right"
+                                        delay={{ show: 250, hide: 400 }}
+                                        //overlay={renderTooltip}
+                                        >
+                                            <svg style={{margin: '2px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
+                                            </svg>
+                                        </OverlayTrigger>
+                                    </Form.Group>
+                                </div>
+                                
+                                <ListGroup>
+                                    {allThemes.length === 0 ? (
+                                        <p className="text-muted text-center py-3">
+                                            No themes defined yet. Add your first theme above.
+                                        </p>
+                                    ) : (
+                                        allThemes.map((label, index) => (
+                                            <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
+                                                <div className="d-flex align-items-center">
+                                                    <div 
+                                                        style={{ 
+                                                            backgroundColor: label.color, 
+                                                            width: '20px', 
+                                                            height: '20px', 
+                                                            borderRadius: '50%', 
+                                                            display: 'inline-block',
+                                                            marginRight: '10px'
+                                                        }}
+                                                    ></div>
+                                                    <div>
+                                                        <div><strong>{label.name}</strong></div>
+                                                        {label.description && (
+                                                            <small className="text-muted">{label.description}</small>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className='d-flex'>
+                                                    <Button 
+                                                        variant="outline-secondary" 
+                                                        size="sm" 
+                                                        className="me-2"
+                                                        //onClick={() => startEditLabel(index)}
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                    <Button 
+                                                        variant="outline-danger" 
+                                                        size="sm" 
+                                                        //onClick={() => deleteLabel(index)}
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                </div>
+                                            </ListGroup.Item>
+                                        ))
+                                    )}
+                                </ListGroup>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="third">
+                                
+                                <div className="d-flex justify-content-between mb-3">
+                                <span>
+                                    {suggestedThemes.length > 0 ? 
+                                        `Found ${suggestedThemes.length} theme suggestions` : 
+                                        "Generate themes"}
+                                </span>
+                                <Button 
+                                    variant="outline-primary" 
+                                    size="sm" 
+                                    onClick={handleGetSuggestedThemes}
+                                    disabled={loadingSuggestions || !sessionId || dataset?.length === 0}
+                                >
+                                    {loadingSuggestions ? (
+                                        <>
+                                            <Spinner 
+                                                as="span" 
+                                                animation="border" 
+                                                size="sm" 
+                                                role="status" 
+                                                aria-hidden="true" 
+                                            /> 
+                                            &nbsp;&nbsp;Refreshing...
+                                        </>
+                                    ) : (
+                                        'Refresh Suggestions'
+                                    )}
+                                </Button>
+                            </div>
+                            
+                            {loadingSuggestions ? (
+                                <div className="text-center py-4">
+                                    <Spinner animation="border" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </Spinner>
+                                    <p className="mt-2">Analyzing your responses to generate theme suggestions...</p>
+                                </div>
+                            ) : suggestedThemes.length > 0 ? (
+                                <ListGroup>
+                                    {suggestedThemes.map((theme, index) => {
+                                        const alreadyAdded = allThemes.some(l => l.name === theme.name);
+                                        return (
+                                            <ListGroup.Item 
+                                                key={index}
+                                                className={`d-flex justify-content-between align-items-center ${alreadyAdded ? 'bg-light' : ''}`}
+                                            >
+                                                <div>
+                                                    <h5>{theme.name} {alreadyAdded}</h5>
+                                                    <p className="text-muted mb-0">{theme.description}</p>
+                                                </div>
+                                                <Button 
+                                                    variant={alreadyAdded ? "outline-secondary" : "outline-primary"}
+                                                    onClick={() => addTheme(theme)}
+                                                    disabled={alreadyAdded}
+                                                    style={{ minWidth: '110px' }}
+                                                >
+                                                    {alreadyAdded ? 'Added' : 'Add Theme'}
+                                                </Button>
+                                            </ListGroup.Item>
+                                        );
+                                    })}
+                                </ListGroup>
+                            ) : (
+                                <p className="text-center text-muted">Click "Refresh Suggestions" to generate new themes.</p>
+                            )}
+
+                            </Tab.Pane>
+                        </Tab.Content>
+                        </Col>
+                    
+                    </Tab.Container>
+                
                 </Row>
                 </Modal.Body>
 
                 <Modal.Footer>
-                <Button variant="secondary">Close</Button>
+                <Button variant="secondary" onClick={() => setShowEditLabels(false)}>Close</Button>
                 <Button variant="primary">Save changes</Button>
                 </Modal.Footer>
             </Modal>
