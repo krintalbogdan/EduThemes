@@ -18,7 +18,8 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
     };
 
     const containerStyle = {
-        height: '90vh',
+        height: 'auto',
+        paddingBottom: '50px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-start',
@@ -28,7 +29,7 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
     const windowStyle = {
         border: '4px solid black',
         width: '100vh',
-        height: '90vh',
+        height: 'auto',
         padding: '35px',
         borderRadius: '12px',
         boxShadow: '8px 8px 0 black',
@@ -130,7 +131,7 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
                     fontSize: '24px',
                     fontWeight: '600',
                     textAlign: 'center',
-                    marginTop: '40px',
+                    marginTop: '20px',
                     marginBottom: '10px'
                 }}>
                     How to Use
@@ -140,7 +141,9 @@ const Start = ({ onSessionStart, onAdvanceStage, setLabels }) => {
                     maxWidth: '700px',
                     margin: '0 auto',
                     lineHeight: '1.8',
-                    fontSize: '16px'
+                    fontSize: '16px',
+                    maxHeight: '8vh',
+                    overflowY: 'auto',
                 }}>
                     <li><strong>Start an Analysis:</strong> Click the "Start Analysis" button to begin.</li>
                     <li><strong>Upload Your Dataset:</strong> Upload your file of text responses.</li>

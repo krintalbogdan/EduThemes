@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Button, Card, Row, Col, Modal, Badge, Spinner, Alert, ProgressBar, Nav, Tab, Form, ListGroup, OverlayTrigger} from 'react-bootstrap';
 import { FaCheck, FaTimes, FaUndo } from 'react-icons/fa';
 import axios, { all } from 'axios';
+import LabelCreationWindow from './LabelCreationWindow';
+//import ReviewModal from './ReviewModal';
 
 const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset, claudeData, onAdvanceStage, projectMetadata }) => {
     const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
@@ -16,6 +18,7 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [loadingSuggestions, setLoadingSuggestions] = useState(false);
     
+
     const unclassifiedTheme = {
         name: "Unclassified",
         description: "Responses that don't fit any other theme",
@@ -56,6 +59,8 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
             [currentTheme.name]: updatedActions
         }));
     };
+
+    
 
 
 
@@ -697,141 +702,7 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
 
                             </Tab.Pane>
                             <Tab.Pane eventKey="second">
-                                <Form> {/*onSubmit={handleSubmit}>*/}
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Theme Name</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            placeholder="Enter theme name"
-                                            //value={newLabel}
-                                            //onChange={(e) => setNewLabel(e.target.value)}
-                                            maxLength={30}
-                                        />
-                                    </Form.Group>
-                                    
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Description</Form.Label>
-                                        <Form.Control
-                                            as="textarea"
-                                            rows={2}
-                                            placeholder="Enter theme description"
-                                            //value={labelDescription}
-                                            //onChange={(e) => setLabelDescription(e.target.value)}
-                                            maxLength={200}
-                                        />
-                                    </Form.Group>
-                                    
-                                    <div className="d-flex mb-3 align-items-center">
-                                        <Form.Label>Theme Color - </Form.Label>
-                                        <Form.Control
-                                            type="color"
-                                            //value={selectedColor}
-                                            //onChange={(e) => setSelectedColor(e.target.value)}
-                                            className="form-control-color m-2"
-                                        />
-
-                                        {true ? (//formMode === 'add' ? (
-                                            <Button 
-                                                variant="success" 
-                                                //onClick={addLabel}
-                                                //disabled={!newLabel.trim() || labels.length >= 10}
-                                                className="d-flex ms-auto"
-                                            >
-                                                Add Theme
-                                            </Button>
-                                        ) : (
-                                            <div className="d-flex ms-auto">
-                                                <Button 
-                                                    variant="primary" 
-                                                    //onClick={updateLabel}
-                                                    className="me-2"
-                                                    //disabled={!newLabel.trim()}
-                                                >
-                                                    Update
-                                                </Button>
-                                                <Button variant="secondary"> {/*onClick={cancelEdit}>*/}
-                                                    Cancel
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </Form>
-                                
-                                <hr />
-                                
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 className="mb-0">Current Themes ({allThemes.length}/10)</h5>
-                                    <Form.Group controlId="formFile">
-                                        <Form.Control 
-                                            type="file" 
-                                            accept=".txt,.csv" 
-                                            //onChange={fileLabel}
-                                            disabled={allThemes.length >= 10}
-                                            size="sm"
-                                        />
-                                        <Form.Text className="text-muted">
-                                            Import themes from CSV or TXT
-                                        </Form.Text>
-                                        <OverlayTrigger
-                                        placement="right"
-                                        delay={{ show: 250, hide: 400 }}
-                                        //overlay={renderTooltip}
-                                        >
-                                            <svg style={{margin: '2px'}} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
-                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
-                                            </svg>
-                                        </OverlayTrigger>
-                                    </Form.Group>
-                                </div>
-                                
-                                <ListGroup>
-                                    {allThemes.length === 0 ? (
-                                        <p className="text-muted text-center py-3">
-                                            No themes defined yet. Add your first theme above.
-                                        </p>
-                                    ) : (
-                                        allThemes.map((label, index) => (
-                                            <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center">
-                                                <div className="d-flex align-items-center">
-                                                    <div 
-                                                        style={{ 
-                                                            backgroundColor: label.color, 
-                                                            width: '20px', 
-                                                            height: '20px', 
-                                                            borderRadius: '50%', 
-                                                            display: 'inline-block',
-                                                            marginRight: '10px'
-                                                        }}
-                                                    ></div>
-                                                    <div>
-                                                        <div><strong>{label.name}</strong></div>
-                                                        {label.description && (
-                                                            <small className="text-muted">{label.description}</small>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className='d-flex'>
-                                                    <Button 
-                                                        variant="outline-secondary" 
-                                                        size="sm" 
-                                                        className="me-2"
-                                                        //onClick={() => startEditLabel(index)}
-                                                    >
-                                                        Edit
-                                                    </Button>
-                                                    <Button 
-                                                        variant="outline-danger" 
-                                                        size="sm" 
-                                                        //onClick={() => deleteLabel(index)}
-                                                    >
-                                                        Delete
-                                                    </Button>
-                                                </div>
-                                            </ListGroup.Item>
-                                        ))
-                                    )}
-                                </ListGroup>
+                                <LabelCreationWindow labels={allThemes || []} setLabels={setLabels} />
                             </Tab.Pane>
                             <Tab.Pane eventKey="third">
                                 
@@ -911,7 +782,7 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
 
                 <Modal.Footer>
                 <Button variant="secondary" onClick={() => setShowEditLabels(false)}>Close</Button>
-                <Button variant="primary">Save changes</Button>
+                {/*<Button variant="primary">Save changes</Button>*/}
                 </Modal.Footer>
             </Modal>
         </Container>

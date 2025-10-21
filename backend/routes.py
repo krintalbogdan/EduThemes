@@ -200,7 +200,7 @@ def upload_dataset(session_id):
                 
                 for theme in unique_themes:
                     if theme and theme.lower() != 'none' and theme.strip():
-                        theme_color = '#' + ''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
+                        theme_color = '#' + ''.join([random.choice('0123456789ABCDE') for _ in range(6)])
                         predefined_themes.append({
                             'name': theme.strip(),
                             'description': f"Theme: {theme.strip()}",

@@ -89,7 +89,7 @@ const Upload = ({ sessionId, onAdvanceStage, setDataset, setVisualization, setPr
             className="d-flex flex-column justify-content-center align-items-center"
             style={{ height: '80vh' }}
         >
-            <Card className="w-75 mx-auto shadow-sm">
+            <Card className="w-75 mt-5 mx-auto shadow-sm">
                 <Card.Header className="bg-primary text-white">
                     <h4 className="mb-0">Upload Dataset & Project Details</h4>
                 </Card.Header>

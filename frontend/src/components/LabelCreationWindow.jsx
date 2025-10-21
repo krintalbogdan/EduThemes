@@ -6,7 +6,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const LabelModal = ({ labels = [], setLabels, buttonBool=true }) => {
+const LabelCreationWindow = ({ labels = [], setLabels, buttonBool=true }) => {
     const [newLabel, setNewLabel] = useState('');
     const [labelDescription, setLabelDescription] = useState('');
     const [selectedColor, setSelectedColor] = useState('#007bff');
@@ -131,6 +131,28 @@ const LabelModal = ({ labels = [], setLabels, buttonBool=true }) => {
 
             setLabels(newLabels);
         };
+            {/*const newLabels = [];
+
+            rows.forEach(row => {
+                const [name, description] = row.split(',').map(item => item.trim());
+                
+                if (name && 
+                    !(name.trim() === '' || 
+                    labels.some(label => label.name.toLowerCase() === name.toLowerCase()) || 
+                    (labels.length + newLabels.length >= 10))) {
+                    
+                    const color = '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');
+                    
+                    newLabels.push({ 
+                        name, 
+                        description: description || "",
+                        color 
+                    });
+                }
+            });
+
+            setLabels(prevLabels => [...prevLabels, ...newLabels]);
+        };*/}
     };
 
     const handleSubmit = (e) => {
@@ -144,13 +166,7 @@ const LabelModal = ({ labels = [], setLabels, buttonBool=true }) => {
 
     return (
         <>
-            <Button variant="primary" onClick={toggleShow}>Edit Themes</Button>
-
-            <Modal show={show} onHide={toggleShow} centered size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>Manage Themes</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+            
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label>Theme Name</Form.Label>
@@ -287,14 +303,8 @@ const LabelModal = ({ labels = [], setLabels, buttonBool=true }) => {
                         )}
                     </ListGroup>
 
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={toggleShow}>Close</Button>
-                </Modal.Footer>
-            </Modal>
+                
         </>
     );
 };
-
-
-export default LabelModal;
+export default LabelCreationWindow;

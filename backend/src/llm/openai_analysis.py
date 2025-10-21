@@ -210,6 +210,11 @@ class openai_frame:
                             if 0 <= resp_idx < len(batch):
                                 global_idx = batch_indices[resp_idx]
                                 assigned_themes = item.get('themes', [])
+
+                                if assigned_themes == []:
+                                    if "Unclassified" not in classifications:
+                                        classifications["Unclassified"] = []
+                                    classifications["Unclassified"].append(global_idx)
                                 
                                 for theme_name in assigned_themes:
                                     if theme_name in theme_names:
@@ -220,6 +225,7 @@ class openai_frame:
                         print(f"Error parsing JSON for batch {i//batch_size + 1}")
                 else:
                     print(f"No valid JSON found for batch {i//batch_size + 1}")
+                    print(result_text)
             
             except Exception as e:
                 print(f"Error processing batch {i//batch_size + 1}: {str(e)}")
