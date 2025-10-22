@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -6,7 +6,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const LabelCreationWindow = ({ labels = [], setLabels, buttonBool=true }) => {
+const LabelCreationWindow = ({ labels = [], setLabels, deleteLabels, buttonBool=true }) => {
     const [newLabel, setNewLabel] = useState('');
     const [labelDescription, setLabelDescription] = useState('');
     const [selectedColor, setSelectedColor] = useState('#007bff');
@@ -15,6 +15,8 @@ const LabelCreationWindow = ({ labels = [], setLabels, buttonBool=true }) => {
     const [formMode, setFormMode] = useState('add');
 
     const toggleShow = () => setShow(!show);
+
+    
 
     const renderTooltip = (props) => (
         <Tooltip id="button-tooltip" {...props}>
@@ -27,11 +29,11 @@ const LabelCreationWindow = ({ labels = [], setLabels, buttonBool=true }) => {
             labels.some(label => label.name.toLowerCase() === newLabel.toLowerCase()) || 
             labels.length >= 10) return;
 
-        setLabels([...labels, { 
+        setLabels({ 
             name: newLabel, 
             description: labelDescription, 
             color: selectedColor 
-        }]);
+        });
         
         setNewLabel('');
         setLabelDescription('');
@@ -80,7 +82,7 @@ const LabelCreationWindow = ({ labels = [], setLabels, buttonBool=true }) => {
     };
 
     const deleteLabel = (index) => {
-        setLabels(labels.filter((_, idx) => idx !== index));
+        deleteLabels(labels.filter((_, idx) => idx !== index));
        
         if (editIndex === index) {
             cancelEdit();

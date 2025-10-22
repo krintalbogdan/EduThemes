@@ -180,6 +180,11 @@ class claude_llm:
                             if 0 <= resp_idx < len(batch):
                                 global_idx = batch_indices[resp_idx]
                                 assigned_themes = item.get('themes', [])
+
+                                if assigned_themes == []:
+                                    if "Unclassified" not in classifications:
+                                        classifications["Unclassified"] = []
+                                    classifications["Unclassified"].append(global_idx)
                                 
                                 for theme_name in assigned_themes:
                                     if theme_name in theme_names:

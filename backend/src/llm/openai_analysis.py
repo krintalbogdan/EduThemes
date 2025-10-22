@@ -237,7 +237,11 @@ class openai_frame:
                     sampled_indices = random.sample(range(len(batch)), sample_size)
                     for idx in sampled_indices:
                         global_idx = batch_indices[idx]
+                        #if "Unclassified" not in classifications:
+                        #    classifications['Unclassified'] = []
+                        #classifications["Unclassified"].append(global_idx)
                         classifications[theme_name].append(global_idx)
+                        print(f"appended {global_idx} to {theme_name}")
         
         return classifications
 

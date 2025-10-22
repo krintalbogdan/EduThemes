@@ -399,7 +399,7 @@ const Preview = ({
                                                     #
                                                 </th>
                                                 <th className="text-center align-middle">Response</th>
-                                                <th className="text-center align-middle" style={{ width: '15%' }}>Themes</th>
+                                                <th className="text-center align-middle" style={{ width: '20%' }}>Themes</th>
                                             </tr>
                                         </thead>
                                         <tbody>

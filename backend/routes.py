@@ -253,6 +253,7 @@ def upload_dataset(session_id):
 
 @routes_bp.route('/session/<session_id>/suggest-themes', methods=['POST'])
 def get_theme_suggestions(session_id):
+    spec_bool_py = False
     try:
         cleanup_expired_sessions()
         session = get_session(session_id)
@@ -260,6 +261,38 @@ def get_theme_suggestions(session_id):
             return jsonify({"error": "Invalid session"}), 400
             
         data = request.get_json()
+        try:
+            specBool = data.get('specBool', '')
+            if specBool and specBool == 'true':
+                spec_bool_py = True
+        except:
+            pass
+
+        if spec_bool_py:
+            research_question = session['research_question']
+            project_description = session['project_description']
+            api_key = data.get('apiKey', '') 
+            responses = data.get('response', '')
+            print(responses)
+            print(responses)
+
+            # CURRENT STATE
+            llm_instance = serve_llm(api_key)
+            print(api_key, llm_instance)
+            
+            suggested_themes = llm_instance.suggest_themes(
+                responses=responses,
+                research_question=research_question,
+                project_description=project_description,
+                #predefined_themes=predefined_themes
+                #api_key=api_key
+            )
+            
+            return jsonify({
+                "message": "Theme suggestions generated successfully",
+                "suggested_themes": suggested_themes
+            })
+
         predefined_themes = data.get('labels', [])
         api_key = data.get('apiKey', '') 
         
@@ -446,6 +479,7 @@ def submit_final_dataset(session_id):
     
 @routes_bp.route('/session/<session_id>/submit-manual-coding', methods=['POST'])
 def submit_manual_coding(session_id):
+    spec_bool_py = False
     try:
         cleanup_expired_sessions()
         session = get_session(session_id)
@@ -453,12 +487,67 @@ def submit_manual_coding(session_id):
             return jsonify({"error": "Invalid session"}), 400
 
         data = request.get_json()
+        try:
+            specBool = data.get('specBool', '')
+            if specBool and specBool == 'true':
+                spec_bool_py = True
+        except:
+            pass
+
+        if spec_bool_py:
+            research_question = session['research_question']
+            project_description = session['project_description']
+            api_key = data.get('apiKey', '') 
+            responses = data.get('response', '')
+            labels = data["labels"]
+            print(responses)
+
+            # CURRENT STATE
+            llm_instance = serve_llm(api_key)
+            print(api_key, llm_instance)
+            research_question = session['research_question']
+            project_description = session['project_description']
+            
+            try:
+                # CURRENT STATE
+                llm_instance = serve_llm(api_key)
+                classifications = llm_instance.classify_responses_by_themes(
+                    responses=responses,
+                    themes=labels,
+                    research_question=research_question,
+                    project_description=project_description,
+                    #api_key=api_key
+                )
+                
+                return jsonify({
+                    "message": "Manual coding submitted successfully.",
+                    "claude_data": classifications,
+                    "svm_data": {}
+                })
+                    
+            except Exception as e:
+                print(f"Error classifying responses: {str(e)}")
+                classifications = {}
+                for label in labels:
+                    theme_name = label['name']
+                    sample_count = max(1, int(len(responses) * 0.2))
+                    sample_indices = random.sample(range(len(responses)), sample_count)
+                    classifications[theme_name] = sample_indices
+                
+                return jsonify({
+                    "message": "Manual coding submitted successfully (fallback data).",
+                    "claude_data": classifications,
+                    "svm_data": {}
+                })
+
         if not data or "labels" not in data or "manual_codings" not in data:
             return jsonify({"error": "Invalid request body"}), 400
 
         labels = data["labels"]
         manual_codings = data["manual_codings"]
+        print(manual_codings)
         api_key = data.get('apiKey', '') 
+
 
         manual_coding_folder = os.path.join(UPLOAD_FOLDER, "manual_codings")
         os.makedirs(manual_coding_folder, exist_ok=True)
@@ -508,6 +597,7 @@ def submit_manual_coding(session_id):
         
         try:
             # CURRENT STATE
+            print(responses)
             llm_instance = serve_llm(api_key)
             classifications = llm_instance.classify_responses_by_themes(
                 responses=responses,
@@ -516,12 +606,13 @@ def submit_manual_coding(session_id):
                 project_description=project_description,
                 #api_key=api_key
             )
-            
-            return jsonify({
+            rez = jsonify({
                 "message": "Manual coding submitted successfully.",
                 "claude_data": classifications,
                 "svm_data": {}
             })
+            print(classifications)
+            return rez
                 
         except Exception as e:
             print(f"Error classifying responses: {str(e)}")
