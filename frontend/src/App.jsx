@@ -10,6 +10,12 @@ import Chatbot from "./components/Chatbot";
 
 import { Container } from "react-bootstrap";
 
+const unclassifiedTheme = {
+        name: "Unclassified",
+        description: "Responses that don't fit any other theme",
+        color: "#cccccc"
+    };
+
 function App() {
   const [sessionId, setSessionId] = useState(null);
   const [dataset, setDataset] = useState(null);
@@ -83,7 +89,7 @@ function App() {
             <Review
               sessionId={sessionId}
               visualization={visualization}
-              labels={labels}
+              labels={[...labels, unclassifiedTheme]}
               setLabels={setLabels}  
               claudeData={claudeData}
               setClaudeData={setClaudeData}

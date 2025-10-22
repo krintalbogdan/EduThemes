@@ -19,6 +19,7 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
     const [loadingSuggestions, setLoadingSuggestions] = useState(false);
     const [tempUncCat, setTempUncCat] = useState({});
     const [aiLoading, setAiLoading] = useState(false);
+    const [allThemes, setAllThemes] = useState([...labels])
     
 
     const unclassifiedTheme = {
@@ -28,7 +29,7 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
     };
     
     const hasUnclassifiedTheme = labels.some(label => label.name === "Unclassified");
-    let allThemes = hasUnclassifiedTheme ? labels : [...labels, unclassifiedTheme];
+    //let allThemes = hasUnclassifiedTheme ? labels : [...labels];
     const currentTheme = allThemes[currentThemeIndex] || { name: "None", color: "#cccccc" };
     let themeResponses = claudeData?.[currentTheme.name] || [];
     
@@ -295,7 +296,7 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
         console.log('send', sent)
         setAiLoading(true);
         const response = await axios.post(`${import.meta.env.VITE_URL}/session/${sessionId}/submit-manual-coding`, {
-                labels: labels,
+                labels: allThemes,
                 response: sent,
                 specBool: 'true',
                 apiKey: projectMetadata.apiKey
@@ -317,7 +318,8 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
     
     const addTheme = (theme) => {
         // Add to labels state
-        setLabels([...labels, theme]);
+        
+        setAllThemes([...allThemes, theme]);
 
         // Initialize empty array for new theme in claudeData
         if (!claudeData[theme.name]) {
