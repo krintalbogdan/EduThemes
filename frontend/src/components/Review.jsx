@@ -231,6 +231,63 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
         }
     }
 
+    const removeThemeFromCode = (theme, responseIndex) => {
+        console.log('juanpabloraba', theme)
+        const selectedTheme = theme;
+        //console.log("selectedThemeObj:", selectedTheme);
+        if (selectedTheme && selectedTheme!=="Unclassified") { //&& claudeData[selectedTheme].includes(responseIndex)) {
+            console.log('broken')
+            const selectedThemeObj = allThemes.find(tema => tema.name === theme);
+            console.log("selectedThemeObj:", selectedThemeObj);
+
+            if (selectedThemeObj) {
+                // Add the response to the selected theme
+                //const responseIndex = themeResponses[idx];
+                // Initialize claudeData for new theme if needed
+                //if (claudeData[selectedTheme]) {
+                //    claudeData[selectedTheme] = [];
+                //}
+                // Add response to selected theme if not already there
+                if (claudeData[selectedTheme].includes(responseIndex)) {
+                    let ind = claudeData[selectedTheme].indexOf(responseIndex);
+                    //claudeData[selectedTheme].push(responseIndex);
+                    claudeData[selectedTheme].splice(ind, 1);
+                }
+                //if (dataset[responseIndex].themes.includes(responseIndex)) {
+                    {/*dataset[responseIndex].themes.push({
+                        name: selectedThemeObj.name,
+                        color: selectedThemeObj.color,
+                        description: selectedThemeObj.description || ""
+                    });*/}
+                    let ind = dataset[responseIndex].themes.find((tema) => tema.name !== selectedThemeObj.name);
+                    console.log('ind', ind)
+                    dataset[responseIndex].themes.splice(ind, 1);
+                //}
+                
+                console.log('test');
+                console.log(dataset[responseIndex].themes);
+                // Remove from unclassified
+                //claudeData["Unclassified"] = claudeData["Unclassified"].filter(
+                //    index => index !== responseIndex
+                //);
+                
+                //console.log(labels);
+                
+                // Initialize and update response actions
+                setResponseActions(prev => {
+                    const updated = { ...prev };
+                    if (!updated[selectedTheme]) {
+                        updated[selectedTheme] = Array(claudeData[selectedTheme].length).fill(null);
+                    }
+                    // Mark as approved in the selected theme
+                    const newIndex = claudeData[selectedTheme].length - 1;
+                    updated[selectedTheme][newIndex] = 'approve';
+                    return updated;
+                });
+            }
+        }
+    }
+
     const queryAI = async () => {
         let sent = themeResponses.map((responseIndex, idx) => {
             return dataset[responseIndex]?.original;
@@ -375,7 +432,7 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
                 <Col xs={3} className="p-2 bg-light h-100">
                     <Card className="mb-2" style={{ height: '20%' }}>
                         <Card.Body className="rounded d-flex flex-column">
-                            <h5>Theme Review</h5><hr/>
+                            <h5>Theme Review</h5><hr style={{ margin: '0px' }}/>
                             <p className="text-muted">
                                 Review the AI-generated classifications by theme. Approve or reject each classification.
                             </p>
@@ -384,7 +441,7 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
                     </Card>
                     <Card className="mb-2" style={{ height: '28%' }}>
                         <Card.Body className="rounded d-flex flex-column">
-                            <strong>Current Theme</strong><hr/>
+                            <strong>Current Theme</strong><hr style={{ marginTop: '3px' }}/>
                             <div className="d-flex align-items-center mb-2">
                                 <div 
                                     style={{ 
@@ -693,6 +750,7 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
                                                                                     marginTop: '0px',
                                                                                     
                                                                                 }}
+                                                                                onClick={() => removeThemeFromCode(theme.name, responseIndex)}
                                                                             >
                                                                                 <p style={{
                                                                                     backgroundColor: calor,

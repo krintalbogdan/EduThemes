@@ -20,6 +20,7 @@ UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 DATABASE = 'sessions.db'
+COLORS = ['#f44336', '#e81e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722']
 
 def cleanup_expired_sessions():
     now = datetime.now()
@@ -200,7 +201,7 @@ def upload_dataset(session_id):
                 
                 for theme in unique_themes:
                     if theme and theme.lower() != 'none' and theme.strip():
-                        theme_color = '#' + ''.join([random.choice('0123456789ABCDE') for _ in range(6)])
+                        theme_color = '#' + ''.join(random.choice(COLORS))#[random.choice('0123456789ABCDE') for _ in range(6)])
                         predefined_themes.append({
                             'name': theme.strip(),
                             'description': f"Theme: {theme.strip()}",
@@ -505,7 +506,7 @@ def submit_manual_coding(session_id):
             # CURRENT STATE
             llm_instance = serve_llm(api_key)
             print(api_key, llm_instance)
-            
+
             try:
                 # CURRENT STATE
                 llm_instance = serve_llm(api_key)
