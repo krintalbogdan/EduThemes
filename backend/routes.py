@@ -505,8 +505,6 @@ def submit_manual_coding(session_id):
             # CURRENT STATE
             llm_instance = serve_llm(api_key)
             print(api_key, llm_instance)
-            research_question = session['research_question']
-            project_description = session['project_description']
             
             try:
                 # CURRENT STATE

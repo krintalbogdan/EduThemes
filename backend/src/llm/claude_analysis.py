@@ -157,7 +157,8 @@ class claude_llm:
 
             if batch_processed:
                 break
-                
+                ##model="claude-3-7-sonnet-20250219",
+                # model="claude-3-7-sonnet-20250219",
             try:
                 print(f"Processing batch {i//batch_size + 1}")
                 api_response = client.messages.create(

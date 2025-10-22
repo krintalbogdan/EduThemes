@@ -30,9 +30,10 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
     const hasUnclassifiedTheme = labels.some(label => label.name === "Unclassified");
     let allThemes = hasUnclassifiedTheme ? labels : [...labels, unclassifiedTheme];
     const currentTheme = allThemes[currentThemeIndex] || { name: "None", color: "#cccccc" };
-    const themeResponses = claudeData?.[currentTheme.name] || [];
+    let themeResponses = claudeData?.[currentTheme.name] || [];
     
     useEffect(() => {
+        
         
         //console.log(dataset)
         
@@ -181,8 +182,6 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
     };
 
     const addThemeToCode = (theme, responseIndex) => {
-        console.log(theme, responseIndex)
-        console.log(allThemes)
         const selectedTheme = theme;
         //console.log("selectedThemeObj:", selectedTheme);
         if (selectedTheme && selectedTheme!=="Unclassified" && !claudeData[selectedTheme].includes(responseIndex)) {
@@ -233,9 +232,10 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
     }
 
     const queryAI = async () => {
-        const sent = themeResponses.map((responseIndex, idx) => {
+        let sent = themeResponses.map((responseIndex, idx) => {
             return dataset[responseIndex]?.original;
         })
+        console.log('send', sent)
         setAiLoading(true);
         const response = await axios.post(`${import.meta.env.VITE_URL}/session/${sessionId}/submit-manual-coding`, {
                 labels: labels,
@@ -245,12 +245,12 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
         });
 
         const dataReturned = response.data.claude_data;
-        //console.log(dataReturned);
+        console.log(dataReturned);
         
         Object.keys(dataReturned).forEach(key => {
             for (var x=0; x<dataReturned[key].length; x++){
-                console.log(key, dataset[dataReturned[key][x]].original)
-                addThemeToCode(key, dataReturned[key][x])
+                console.log(key, dataset[themeResponses[dataReturned[key][x]]].original)
+                addThemeToCode(key, themeResponses[dataReturned[key][x]])
             }
         });
         
