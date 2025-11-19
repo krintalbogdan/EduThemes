@@ -35,6 +35,20 @@ const Preview = ({
       }
     }, [dataset, selectedEntry]);
 
+    const getRandomItem = (arr) => {
+        // Generate a random floating-point number between 0 (inclusive) and 1 (exclusive)
+        const randomIndex = Math.random();
+
+        // Multiply by the array's length to get a number between 0 and array.length (exclusive)
+        const scaledIndex = randomIndex * arr.length;
+
+        // Use Math.floor to round down to the nearest whole number, giving a valid array index
+        const floorIndex = Math.floor(scaledIndex);
+
+        // Return the item at the randomly generated index
+        return arr[floorIndex];
+    }
+
     const handleSelectEntry = (entry, index) => {
         if (index === selectedIndex) {
             return;
@@ -137,7 +151,8 @@ const Preview = ({
     const handleAddSuggestedTheme = (theme) => {
         const themeExists = labels.some(label => label.name === theme.name);
         if (!themeExists) {
-            const color = '#' + Math.floor(Math.random()*16777215).toString(16);
+            const COLORS = ['#f44336', '#e81e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+            const color = getRandomItem(COLORS)//Math.floor(Math.random()*16777215).toString(16);
             
             const newTheme = {
                 name: theme.name,

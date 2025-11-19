@@ -421,11 +421,11 @@ const Review = ({ sessionId, labels, setLabels, setResults, dataset, setDataset,
         return actions && actions.every(action => action !== null);
     }).length;
     
-    const progressPercentage = currentTheme.name === "Unclassified" 
-        ? 100 
+    const progressPercentage =  isLoading ? 100 : ( currentTheme.name === "Unclassified" 
+        ? (allThemes.filter(theme => theme.name !== "Unclassified").length / allThemes.length) * 100
         : totalThemes > 0 
             ? (completedThemes / totalThemes) * 100 
-            : 0;
+            : 0);
     const formattedThemeName = `${currentTheme.name} (${themeResponses.length} responses)`;
 
     return (

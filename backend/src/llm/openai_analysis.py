@@ -126,6 +126,12 @@ class openai_frame:
         
         theme_names = [theme['name'] for theme in themes]
         classifications = {theme_name: [] for theme_name in theme_names}
+        mcodes = {}
+        for code in manual_codes:
+            mcodes[code['index']] = code['themes'][0]
+        print("mcode")
+        print(mcodes)
+
         
         for i in range(0, len(responses), batch_size):
             batch = responses[i:i+batch_size]
@@ -137,7 +143,12 @@ class openai_frame:
             
             response_text = ""
             for j, resp in enumerate(batch):
-                response_text += f"Response {j+1}: \"{resp}\"\n"
+                if mcodes.get(i+j) == None:
+
+                    response_text += f"Response {j+1}: \"{resp}\"\n"
+                else:
+                    response_text += f"Response {j+1}: \"{resp}\" Themes related to this response: {mcodes[j+i]['name']}"
+            
             
             prompt = f"""
             You are analyzing responses for a qualitative research project.

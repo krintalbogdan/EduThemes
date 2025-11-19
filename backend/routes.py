@@ -501,6 +501,7 @@ def submit_manual_coding(session_id):
             api_key = data.get('apiKey', '') 
             responses = data.get('response', '')
             labels = data["labels"]
+            print("begin here")
             print(responses)
 
             # CURRENT STATE
@@ -544,6 +545,7 @@ def submit_manual_coding(session_id):
 
         labels = data["labels"]
         manual_codings = data["manual_codings"]
+        print("begin here")
         print(manual_codings)
         api_key = data.get('apiKey', '') 
 
@@ -603,6 +605,7 @@ def submit_manual_coding(session_id):
                 themes=labels,
                 research_question=research_question,
                 project_description=project_description,
+                manual_codes=manual_codings,
                 #api_key=api_key
             )
             rez = jsonify({

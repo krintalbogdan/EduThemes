@@ -92,7 +92,7 @@ class claude_llm:
         ][:max_themes]
 
     @staticmethod
-    def classify_responses_by_themes(responses, themes, research_question="", project_description="", api_key=deflt_key, batch_size=10):
+    def classify_responses_by_themes(responses, themes, research_question="", project_description="", api_key=deflt_key, batch_size=10, manual_codes = None):
         if api_key is None or api_key == '':
             api_key = os.environ.get("ANTHROPIC_API_KEY")
             if not api_key:
@@ -109,6 +109,13 @@ class claude_llm:
         theme_names = [theme['name'] for theme in themes]
         classifications = {theme_name: [] for theme_name in theme_names}
         
+        mcodes = {}
+        for code in manual_codes:
+            mcodes[code['index']] = code['themes'][0]
+        print("mcode")
+        print(mcodes)
+
+        
         for i in range(0, len(responses), batch_size):
             batch = responses[i:i+batch_size]
             batch_indices = list(range(i, min(i+batch_size, len(responses))))
@@ -119,7 +126,11 @@ class claude_llm:
             
             response_text = ""
             for j, resp in enumerate(batch):
-                response_text += f"Response {j+1}: \"{resp}\"\n"
+                if mcodes.get(i+j) == None:
+
+                    response_text += f"Response {j+1}: \"{resp}\"\n"
+                else:
+                    response_text += f"Response {j+1}: \"{resp}\" Themes related to this response: {mcodes[j+i]['name']}"
             
             prompt = f"""
             You are analyzing responses for a qualitative research project.
@@ -127,7 +138,7 @@ class claude_llm:
             Research Question: {research_question}
             Project Description: {project_description}
             
-            Analyze each response and determine which themes apply. Be critical and selective.
+            Analyze each response and determine which themes apply. Responses will either be submitted individually or with themes associated. These theme names were selected by a human, and must be kept in the output. Be critical and selective.
             
             Themes:
             {theme_text}
@@ -152,6 +163,7 @@ class claude_llm:
             4. Only classify a response under a theme if there is strong evidence in the text.
             """
 
+            print(prompt)
             batch_processed = False
             
 
